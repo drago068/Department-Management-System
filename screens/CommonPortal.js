@@ -17,7 +17,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function CommonPortal({ route, navigation }) {
-  const role = route?.params?.role || "student"; // 'student' | 'staff' | 'admin'
+  const role = route?.params?.role || null;
   const [searchQuery, setSearchQuery] = useState("");
 
   const campusServices = [
@@ -91,46 +91,6 @@ export default function CommonPortal({ route, navigation }) {
     Linking.openURL("mailto:info@suguna.ac.in");
   };
 
-  const navigateToDashboard = () => {
-    if (role === "admin") {
-      navigation?.navigate("AdminDashboard");
-    } else if (role === "staff") {
-      navigation?.navigate("StaffDashboard");
-    } else {
-      navigation?.navigate("StudentDashboard");
-    }
-  };
-
-  const navigateToAttendance = () => {
-    if (role === "admin") {
-      navigation?.navigate("AttendanceReview");
-    } else if (role === "staff") {
-      navigation?.navigate("MarkAttendance");
-    } else {
-      navigation?.navigate("StudentAttendanceDetail");
-    }
-  };
-
-  const navigateToReports = () => {
-    if (role === "admin") {
-      navigation?.navigate("ReportManagement");
-    } else if (role === "staff") {
-      navigation?.navigate("AttendanceHistory");
-    } else {
-      navigation?.navigate("AttendanceHistory");
-    }
-  };
-
-  const navigateToProfile = () => {
-    if (role === "admin") {
-      navigation?.navigate("AdminProfile");
-    } else if (role === "staff") {
-      navigation?.navigate("StaffProfile");
-    } else {
-      navigation?.navigate("StudentProfile");
-    }
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar
@@ -170,15 +130,15 @@ export default function CommonPortal({ route, navigation }) {
             </View>
 
             <View style={styles.headerRightSection}>
-              {/* Role badge */}
+              {/* Back to Login Portals button */}
               <TouchableOpacity
-                style={styles.roleBadgeBtn}
-                onPress={navigateToDashboard}
+                style={styles.loginPortalsBtn}
+                onPress={() => navigation?.navigate("Login")}
                 activeOpacity={0.8}
               >
-                <MaterialIcons name="dashboard" size={14} color="#003fb1" />
-                <Text style={styles.roleBadgeText}>
-                  {role === "admin" ? "Admin Portal" : role === "staff" ? "Staff Portal" : "Student Portal"}
+                <MaterialIcons name="lock" size={14} color="#003fb1" />
+                <Text style={styles.loginPortalsText}>
+                  Sign In
                 </Text>
               </TouchableOpacity>
 
@@ -293,10 +253,46 @@ export default function CommonPortal({ route, navigation }) {
 
 
           {/* =====================================================
-              REAL-TIME ALERTS
+              PORTAL LOGIN QUICK SHORTCUTS
           ===================================================== */}
 
-          <View style={styles.alertSection} />
+          <View style={styles.portalShortcutsSection}>
+            <Text style={styles.shortcutHeading}>Select Portal to Authenticate</Text>
+            <View style={styles.shortcutsRow}>
+              <TouchableOpacity
+                style={styles.shortcutCard}
+                onPress={() => navigation?.navigate("StudentLogin")}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.shortcutIconWrap, { backgroundColor: '#dbe1ff' }]}>
+                  <MaterialIcons name="school" size={20} color="#003fb1" />
+                </View>
+                <Text style={styles.shortcutLabel}>Student</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.shortcutCard}
+                onPress={() => navigation?.navigate("StaffLogin")}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.shortcutIconWrap, { backgroundColor: '#e0e7ff' }]}>
+                  <MaterialIcons name="badge" size={20} color="#3730a3" />
+                </View>
+                <Text style={styles.shortcutLabel}>Staff</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.shortcutCard}
+                onPress={() => navigation?.navigate("AdminLogin")}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.shortcutIconWrap, { backgroundColor: '#fee2e2' }]}>
+                  <MaterialIcons name="shield" size={20} color="#991b1b" />
+                </View>
+                <Text style={styles.shortcutLabel}>Admin</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
 
           {/* =====================================================
@@ -1007,7 +1003,7 @@ export default function CommonPortal({ route, navigation }) {
 
           <View style={styles.bottomNavInner}>
 
-            {/* HOME */}
+            {/* CAMPUS HUB (ACTIVE) */}
 
             <TouchableOpacity
               style={styles.navItem}
@@ -1015,73 +1011,73 @@ export default function CommonPortal({ route, navigation }) {
             >
 
               <MaterialIcons
-                name="home"
-                size={24}
+                name="public"
+                size={22}
                 color="#1a56db"
               />
 
               <Text style={styles.activeNavText}>
-                Hub
+                Campus Hub
               </Text>
 
             </TouchableOpacity>
 
 
-            {/* DASHBOARD */}
+            {/* STUDENT PORTAL */}
 
             <TouchableOpacity
               style={styles.navItem}
-              onPress={navigateToDashboard}
+              onPress={() => navigation?.navigate("StudentLogin")}
             >
 
               <MaterialIcons
-                name="dashboard"
-                size={24}
+                name="school"
+                size={22}
                 color="#434654"
               />
 
               <Text style={styles.navText}>
-                Dashboard
+                Student
               </Text>
 
             </TouchableOpacity>
 
 
-            {/* ATTENDANCE */}
+            {/* STAFF PORTAL */}
 
             <TouchableOpacity
               style={styles.navItem}
-              onPress={navigateToAttendance}
+              onPress={() => navigation?.navigate("StaffLogin")}
             >
 
               <MaterialIcons
-                name="how-to-reg"
-                size={24}
+                name="badge"
+                size={22}
                 color="#434654"
               />
 
               <Text style={styles.navText}>
-                Attendance
+                Staff
               </Text>
 
             </TouchableOpacity>
 
 
-            {/* PROFILE */}
+            {/* ADMIN PORTAL */}
 
             <TouchableOpacity
               style={styles.navItem}
-              onPress={navigateToProfile}
+              onPress={() => navigation?.navigate("AdminLogin")}
             >
 
               <MaterialIcons
-                name="person"
-                size={24}
+                name="shield"
+                size={22}
                 color="#434654"
               />
 
               <Text style={styles.navText}>
-                Profile
+                Admin
               </Text>
 
             </TouchableOpacity>
@@ -1164,19 +1160,19 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 
-  roleBadgeBtn: {
+  loginPortalsBtn: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
     backgroundColor: "#dbe1ff",
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderRadius: 16,
   },
 
-  roleBadgeText: {
+  loginPortalsText: {
     fontSize: 11,
-    fontWeight: "600",
+    fontWeight: "700",
     color: "#003fb1",
   },
 
@@ -1321,10 +1317,56 @@ const styles = StyleSheet.create({
   },
 
 
-  /* ================= ALERT ================= */
+  /* ================= PORTAL SHORTCUTS ================= */
 
-  alertSection: {
-    height: 8,
+  portalShortcutsSection: {
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+
+  shortcutHeading: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#64748b",
+    marginBottom: 8,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+
+  shortcutsRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+
+  shortcutCard: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+
+  shortcutIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
+
+  shortcutLabel: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#1e293b",
   },
 
 
@@ -2040,7 +2082,7 @@ const styles = StyleSheet.create({
   },
 
   navItem: {
-    width: 64,
+    width: 72,
     height: 48,
     alignItems: "center",
     justifyContent: "center",
@@ -2049,16 +2091,16 @@ const styles = StyleSheet.create({
 
   navText: {
     color: "#434654",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
-    lineHeight: 16,
+    lineHeight: 14,
   },
 
   activeNavText: {
     color: "#1a56db",
-    fontSize: 12,
-    fontWeight: "600",
-    lineHeight: 16,
+    fontSize: 11,
+    fontWeight: "700",
+    lineHeight: 14,
   },
 
 });

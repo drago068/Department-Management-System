@@ -10,11 +10,32 @@ const StudentLogin = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = () => {
-    navigation.navigate('CommonPortal', { role: 'student' });
+    navigation.navigate('StudentDashboard');
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Top Header with Back and Campus Hub */}
+      <View style={styles.topHeader}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.navigate('Login')}
+          activeOpacity={0.7}
+        >
+          <MaterialIcons name="arrow-back" size={20} color="#334155" />
+          <Text style={styles.backButtonText}>Roles</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.campusHubButton}
+          onPress={() => navigation.navigate('CommonPortal', { role: 'student' })}
+          activeOpacity={0.8}
+        >
+          <MaterialIcons name="public" size={16} color="#003fb1" />
+          <Text style={styles.campusHubButtonText}>Campus Hub</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
         {/* Background decorations represented as simple views */}
         <View style={styles.bgDecor1} />
@@ -85,17 +106,27 @@ const StudentLogin = ({ navigation }) => {
 
             {/* Submit Button */}
             <TouchableOpacity style={styles.submitButton} onPress={handleLogin} activeOpacity={0.8}>
-              <Text style={styles.submitButtonText}>Login as Student</Text>
-              <MaterialIcons name="arrow-forward" size={20} color={Colors.onPrimary} />
+              <Text style={styles.submitButtonText}>Sign In</Text>
+              <MaterialIcons name="login" size={20} color={Colors.onPrimary} />
+            </TouchableOpacity>
+
+            {/* Quick Access to Common Hub */}
+            <TouchableOpacity
+              style={styles.commonHubRow}
+              onPress={() => navigation.navigate('CommonPortal', { role: 'student' })}
+              activeOpacity={0.7}
+            >
+              <MaterialIcons name="grid-view" size={16} color="#003fb1" />
+              <Text style={styles.commonHubRowText}>View Public Campus Hub (Circulars & Timetables)</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Footer Links */}
+          {/* Footer */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Need help accessing your account?</Text>
+            <Text style={styles.footerText}>Need help with your student account?</Text>
             <TouchableOpacity style={styles.footerLink}>
-              <MaterialIcons name="support-agent" size={14} color={Colors.primary} />
-              <Text style={styles.footerLinkText}>Contact Admin</Text>
+              <Text style={styles.footerLinkText}>Contact Academic Coordinator</Text>
+              <MaterialIcons name="arrow-forward" size={14} color={Colors.primary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -107,47 +138,81 @@ const StudentLogin = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceContainerLow,
+  },
+  topHeader: {
+    height: 52,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+    zIndex: 10,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+  },
+  backButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#334155',
+  },
+  campusHubButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#dbe1ff',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 16,
+  },
+  campusHubButtonText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#003fb1',
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
+    padding: 16,
   },
   bgDecor1: {
     position: 'absolute',
-    top: -50,
-    left: -50,
+    top: -100,
+    right: -100,
     width: 300,
-    height: 200,
-    backgroundColor: Colors.primaryFixed,
-    opacity: 0.3,
+    height: 300,
     borderRadius: 150,
+    backgroundColor: 'rgba(219, 225, 255, 0.4)',
   },
   bgDecor2: {
     position: 'absolute',
-    bottom: -50,
-    right: -50,
-    width: 250,
-    height: 250,
-    backgroundColor: Colors.secondaryFixed,
-    opacity: 0.2,
-    borderRadius: 125,
+    bottom: -150,
+    left: -150,
+    width: 400,
+    height: 400,
+    borderRadius: 200,
+    backgroundColor: 'rgba(235, 237, 248, 0.5)',
   },
   container: {
-    paddingHorizontal: 16,
+    width: '100%',
     maxWidth: 420,
     alignSelf: 'center',
-    width: '100%',
   },
   logoHeader: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   logo: {
     width: 64,
     height: 64,
-    borderRadius: 12,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   brandName: {
     ...Typography.headlineLgMobile,
@@ -162,15 +227,15 @@ const styles = StyleSheet.create({
   },
   loginCard: {
     backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 24,
     borderWidth: 1,
     borderColor: Colors.outlineVariant,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 15,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
   },
   cardHeader: {
     marginBottom: 16,
@@ -209,7 +274,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.outlineVariant,
     borderRadius: 8,
-    height: 40,
+    height: 42,
   },
   inputIcon: {
     paddingLeft: 12,
@@ -229,27 +294,46 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.primary,
-    height: 40,
+    height: 44,
     borderRadius: 8,
     gap: 8,
     marginTop: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
     elevation: 2,
   },
   submitButtonText: {
     ...Typography.labelMd,
     color: Colors.onPrimary,
+    fontWeight: '700',
+  },
+  commonHubRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 16,
+    paddingVertical: 8,
+    backgroundColor: '#f3f3fe',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#dbe1ff',
+  },
+  commonHubRowText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#003fb1',
   },
   footer: {
-    marginTop: 24,
+    marginTop: 20,
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   footerText: {
     ...Typography.bodyMd,
+    fontSize: 12,
     color: Colors.onSurfaceVariant,
     textAlign: 'center',
   },

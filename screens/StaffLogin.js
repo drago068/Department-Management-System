@@ -11,11 +11,32 @@ const StaffLogin = ({ navigation }) => {
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = () => {
-    navigation.navigate('CommonPortal', { role: 'staff' });
+    navigation.navigate('StaffDashboard');
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Top Header with Back and Campus Hub */}
+      <View style={styles.topHeader}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.navigate('Login')}
+          activeOpacity={0.7}
+        >
+          <MaterialIcons name="arrow-back" size={20} color="#334155" />
+          <Text style={styles.backButtonText}>Roles</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.campusHubButton}
+          onPress={() => navigation.navigate('CommonPortal', { role: 'staff' })}
+          activeOpacity={0.8}
+        >
+          <MaterialIcons name="public" size={16} color="#003fb1" />
+          <Text style={styles.campusHubButtonText}>Campus Hub</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
         {/* Background decorations */}
         <View style={styles.bgDecor1} />
@@ -47,10 +68,11 @@ const StaffLogin = ({ navigation }) => {
                 <MaterialIcons name="badge" size={20} color={Colors.outline} style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
-                  placeholder="e.g. FAC-2024-001"
+                  placeholder="e.g. STF-88219 or name@nexus.edu"
                   placeholderTextColor={Colors.outline}
                   value={staffId}
                   onChangeText={setStaffId}
+                  autoCapitalize="none"
                 />
               </View>
             </View>
@@ -74,34 +96,51 @@ const StaffLogin = ({ navigation }) => {
                   secureTextEntry={!showPassword}
                 />
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.visibilityButton}>
-                  <MaterialIcons name={showPassword ? 'visibility-off' : 'visibility'} size={20} color={Colors.outline} />
+                  <MaterialIcons
+                    name={showPassword ? 'visibility-off' : 'visibility'}
+                    size={20}
+                    color={Colors.outline}
+                  />
                 </TouchableOpacity>
               </View>
             </View>
 
-            {/* Remember Me */}
-            <TouchableOpacity style={styles.rememberRow} onPress={() => setRememberMe(!rememberMe)} activeOpacity={0.7}>
-              <MaterialIcons
-                name={rememberMe ? 'check-box' : 'check-box-outline-blank'}
-                size={20}
-                color={rememberMe ? Colors.primary : Colors.outlineVariant}
-              />
-              <Text style={styles.rememberText}>Remember me for 30 days</Text>
+            {/* Remember Me Checkbox */}
+            <TouchableOpacity
+              style={styles.checkboxRow}
+              onPress={() => setRememberMe(!rememberMe)}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+                {rememberMe && <MaterialIcons name="check" size={14} color={Colors.onPrimary} />}
+              </View>
+              <Text style={styles.checkboxLabel}>Remember my credentials</Text>
             </TouchableOpacity>
 
-            {/* Submit Button */}
+            {/* Login Button */}
             <TouchableOpacity style={styles.submitButton} onPress={handleLogin} activeOpacity={0.8}>
-              <Text style={styles.submitButtonText}>Login as Staff</Text>
+              <Text style={styles.submitButtonText}>Log In to Portal</Text>
               <MaterialIcons name="arrow-forward" size={20} color={Colors.onPrimary} />
+            </TouchableOpacity>
+
+            {/* Quick Access to Common Hub */}
+            <TouchableOpacity
+              style={styles.commonHubRow}
+              onPress={() => navigation.navigate('CommonPortal', { role: 'staff' })}
+              activeOpacity={0.7}
+            >
+              <MaterialIcons name="grid-view" size={16} color="#003fb1" />
+              <Text style={styles.commonHubRowText}>View Public Campus Hub (Circulars & Timetables)</Text>
             </TouchableOpacity>
           </View>
 
           {/* Footer */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              Need help accessing your account?{' '}
-              <Text style={styles.footerLinkInline}>Contact Support</Text>
-            </Text>
+            <Text style={styles.footerText}>Having issues logging in?</Text>
+            <TouchableOpacity style={styles.footerLink}>
+              <Text style={styles.footerLinkText}>Contact IT Helpdesk</Text>
+              <MaterialIcons name="arrow-forward" size={14} color={Colors.primary} />
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -112,88 +151,123 @@ const StaffLogin = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceContainerLow,
+  },
+  topHeader: {
+    height: 52,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+    zIndex: 10,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+  },
+  backButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#334155',
+  },
+  campusHubButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#dbe1ff',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 16,
+  },
+  campusHubButtonText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#003fb1',
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
+    padding: 16,
   },
   bgDecor1: {
     position: 'absolute',
-    top: -100,
-    right: -50,
-    width: 350,
-    height: 350,
-    backgroundColor: Colors.primaryFixed,
-    opacity: 0.3,
-    borderRadius: 175,
+    top: -120,
+    left: -80,
+    width: 320,
+    height: 320,
+    borderRadius: 160,
+    backgroundColor: 'rgba(219, 225, 255, 0.4)',
   },
   bgDecor2: {
     position: 'absolute',
     bottom: -100,
-    left: -50,
-    width: 300,
-    height: 300,
-    backgroundColor: Colors.secondaryFixed,
-    opacity: 0.4,
-    borderRadius: 150,
+    right: -100,
+    width: 350,
+    height: 350,
+    borderRadius: 175,
+    backgroundColor: 'rgba(235, 237, 248, 0.5)',
   },
   container: {
-    paddingHorizontal: 16,
+    width: '100%',
     maxWidth: 420,
     alignSelf: 'center',
-    width: '100%',
   },
   logoHeader: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   logo: {
-    width: 96,
-    height: 96,
+    width: 64,
+    height: 64,
     marginBottom: 8,
   },
   brandName: {
     ...Typography.headlineLgMobile,
     color: Colors.primary,
+    textAlign: 'center',
   },
   portalLabel: {
-    ...Typography.bodyMd,
-    color: Colors.onSurfaceVariant,
+    ...Typography.labelMd,
+    color: Colors.secondary,
     marginTop: 4,
+    textAlign: 'center',
   },
   loginCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    borderRadius: 12,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: 16,
     padding: 24,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderColor: Colors.outlineVariant,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
   },
   cardHeader: {
     marginBottom: 16,
-    alignItems: 'center',
   },
   cardTitle: {
     ...Typography.headlineSm,
     color: Colors.onSurface,
+    marginBottom: 4,
   },
   cardSubtitle: {
     ...Typography.bodyMd,
     color: Colors.onSurfaceVariant,
-    marginTop: 4,
-    textAlign: 'center',
   },
   fieldGroup: {
     marginBottom: 16,
   },
   label: {
-    ...Typography.labelMd,
-    color: Colors.onSurface,
+    ...Typography.labelSm,
+    color: Colors.onSurfaceVariant,
     marginBottom: 4,
   },
   labelRow: {
@@ -209,11 +283,11 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceContainerLowest,
+    backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.outlineVariant,
     borderRadius: 8,
-    height: 40,
+    height: 42,
   },
   inputIcon: {
     paddingLeft: 12,
@@ -228,44 +302,84 @@ const styles = StyleSheet.create({
   visibilityButton: {
     paddingRight: 12,
   },
-  rememberRow: {
+  checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
     marginBottom: 16,
+    gap: 8,
   },
-  rememberText: {
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.outline,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.surface,
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  checkboxLabel: {
     ...Typography.bodyMd,
     color: Colors.onSurfaceVariant,
+    fontSize: 13,
   },
   submitButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.primary,
-    paddingVertical: 10,
+    height: 44,
     borderRadius: 8,
     gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
     elevation: 2,
   },
   submitButtonText: {
     ...Typography.labelMd,
     color: Colors.onPrimary,
+    fontWeight: '700',
+  },
+  commonHubRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 16,
+    paddingVertical: 8,
+    backgroundColor: '#f3f3fe',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#dbe1ff',
+  },
+  commonHubRowText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#003fb1',
   },
   footer: {
-    marginTop: 24,
+    marginTop: 20,
     alignItems: 'center',
+    gap: 6,
   },
   footerText: {
     ...Typography.bodyMd,
+    fontSize: 12,
     color: Colors.onSurfaceVariant,
     textAlign: 'center',
   },
-  footerLinkInline: {
+  footerLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  footerLinkText: {
     ...Typography.labelMd,
     color: Colors.primary,
   },

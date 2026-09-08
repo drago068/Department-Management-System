@@ -12,11 +12,32 @@ const AdminLogin = ({ navigation }) => {
   const [rememberDevice, setRememberDevice] = useState(false);
 
   const handleLogin = () => {
-    navigation.navigate('CommonPortal', { role: 'admin' });
+    navigation.navigate('AdminDashboard');
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Top Header with Back and Campus Hub */}
+      <View style={styles.topHeader}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.navigate('Login')}
+          activeOpacity={0.7}
+        >
+          <MaterialIcons name="arrow-back" size={20} color="#334155" />
+          <Text style={styles.backButtonText}>Roles</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.campusHubButton}
+          onPress={() => navigation.navigate('CommonPortal', { role: 'admin' })}
+          activeOpacity={0.8}
+        >
+          <MaterialIcons name="public" size={16} color="#003fb1" />
+          <Text style={styles.campusHubButtonText}>Campus Hub</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
         {/* Background decorations */}
         <View style={styles.bgDecor1} />
@@ -44,93 +65,110 @@ const AdminLogin = ({ navigation }) => {
             {/* Top gradient bar */}
             <View style={styles.gradientBar} />
 
-            <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>Admin Portal Login</Text>
-              <View style={styles.divider} />
-
-              {/* Username */}
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>Admin Username</Text>
-                <View style={styles.inputWrapper}>
-                  <MaterialIcons name="person" size={20} color={Colors.outline} style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter administrator ID"
-                    placeholderTextColor={Colors.outline}
-                    value={username}
-                    onChangeText={setUsername}
-                  />
-                </View>
+            <View style={styles.cardHeader}>
+              <View style={styles.headerIconWrapper}>
+                <MaterialIcons name="admin-panel-settings" size={24} color={Colors.primary} />
               </View>
-
-              {/* Password */}
-              <View style={styles.fieldGroup}>
-                <Text style={styles.label}>Password</Text>
-                <View style={styles.inputWrapper}>
-                  <MaterialIcons name="lock" size={20} color={Colors.outline} style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter password"
-                    placeholderTextColor={Colors.outline}
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={!showPassword}
-                  />
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.visibilityButton}>
-                    <MaterialIcons name={showPassword ? 'visibility-off' : 'visibility'} size={20} color={Colors.outline} />
-                  </TouchableOpacity>
-                </View>
+              <View style={styles.headerTexts}>
+                <Text style={styles.cardTitle}>Administrative Access</Text>
+                <Text style={styles.cardSubtitle}>Enter your institutional credentials to authenticate.</Text>
               </View>
-
-              {/* 2FA Code */}
-              <View style={styles.fieldGroup}>
-                <View style={styles.labelRow}>
-                  <Text style={styles.label}>2FA Code</Text>
-                  <View style={styles.requiredBadge}>
-                    <Text style={styles.requiredBadgeText}>Required for Admin</Text>
-                  </View>
-                </View>
-                <View style={styles.inputWrapper}>
-                  <MaterialIcons name="pin" size={20} color={Colors.outline} style={styles.inputIcon} />
-                  <TextInput
-                    style={[styles.input, { letterSpacing: 4 }]}
-                    placeholder="000000"
-                    placeholderTextColor={Colors.outline}
-                    value={twoFA}
-                    onChangeText={setTwoFA}
-                    keyboardType="numeric"
-                    maxLength={6}
-                  />
-                </View>
-              </View>
-
-              {/* Options Row */}
-              <View style={styles.optionsRow}>
-                <TouchableOpacity style={styles.rememberRow} onPress={() => setRememberDevice(!rememberDevice)} activeOpacity={0.7}>
-                  <MaterialIcons
-                    name={rememberDevice ? 'check-box' : 'check-box-outline-blank'}
-                    size={20}
-                    color={rememberDevice ? Colors.primary : Colors.outlineVariant}
-                  />
-                  <Text style={styles.rememberText}>Remember this device</Text>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <Text style={styles.forgotLink}>Forgot Password?</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Submit Button */}
-              <TouchableOpacity style={styles.submitButton} onPress={handleLogin} activeOpacity={0.8}>
-                <MaterialIcons name="login" size={20} color={Colors.onPrimary} />
-                <Text style={styles.submitButtonText}>Secure Login</Text>
-              </TouchableOpacity>
             </View>
+
+            {/* Username Field */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Admin Username / ID</Text>
+              <View style={styles.inputWrapper}>
+                <MaterialIcons name="person" size={20} color={Colors.outline} style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="e.g. ADM-2024-001"
+                  placeholderTextColor={Colors.outline}
+                  value={username}
+                  onChangeText={setUsername}
+                  autoCapitalize="none"
+                />
+              </View>
+            </View>
+
+            {/* Password Field */}
+            <View style={styles.fieldGroup}>
+              <View style={styles.labelRow}>
+                <Text style={styles.label}>Master Password</Text>
+                <TouchableOpacity>
+                  <Text style={styles.forgotLink}>Reset Key?</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.inputWrapper}>
+                <MaterialIcons name="lock" size={20} color={Colors.outline} style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••••••"
+                  placeholderTextColor={Colors.outline}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.visibilityButton}>
+                  <MaterialIcons
+                    name={showPassword ? 'visibility-off' : 'visibility'}
+                    size={20}
+                    color={Colors.outline}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* 2FA Token Field */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>2FA Security Token</Text>
+              <View style={styles.inputWrapper}>
+                <MaterialIcons name="security" size={20} color={Colors.outline} style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="6-digit code"
+                  placeholderTextColor={Colors.outline}
+                  value={twoFA}
+                  onChangeText={setTwoFA}
+                  keyboardType="numeric"
+                  maxLength={6}
+                />
+              </View>
+            </View>
+
+            {/* Remember Device Checkbox */}
+            <TouchableOpacity
+              style={styles.checkboxRow}
+              onPress={() => setRememberDevice(!rememberDevice)}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.checkbox, rememberDevice && styles.checkboxChecked]}>
+                {rememberDevice && <MaterialIcons name="check" size={14} color={Colors.onPrimary} />}
+              </View>
+              <Text style={styles.checkboxLabel}>Trust this device for 30 days</Text>
+            </TouchableOpacity>
+
+            {/* Submit Button */}
+            <TouchableOpacity style={styles.submitButton} onPress={handleLogin} activeOpacity={0.8}>
+              <MaterialIcons name="verified-user" size={20} color={Colors.onPrimary} />
+              <Text style={styles.submitButtonText}>Authorize Session</Text>
+            </TouchableOpacity>
+
+            {/* Quick Access to Common Hub */}
+            <TouchableOpacity
+              style={styles.commonHubRow}
+              onPress={() => navigation.navigate('CommonPortal', { role: 'admin' })}
+              activeOpacity={0.7}
+            >
+              <MaterialIcons name="grid-view" size={16} color="#003fb1" />
+              <Text style={styles.commonHubRowText}>View Public Campus Hub (Circulars & Timetables)</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Footer */}
           <View style={styles.footer}>
-            <MaterialIcons name="security" size={16} color={Colors.outline} />
-            <Text style={styles.footerText}>Connection is encrypted and monitored.</Text>
+            <MaterialIcons name="lock-outline" size={16} color={Colors.outline} />
+            <Text style={styles.footerText}>Secure 256-Bit Encrypted Portal Access</Text>
           </View>
         </View>
       </ScrollView>
@@ -141,47 +179,81 @@ const AdminLogin = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.surfaceContainerLow,
+  },
+  topHeader: {
+    height: 52,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+    zIndex: 10,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+  },
+  backButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#334155',
+  },
+  campusHubButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#dbe1ff',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 16,
+  },
+  campusHubButtonText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#003fb1',
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
+    padding: 16,
   },
   bgDecor1: {
     position: 'absolute',
-    top: -96,
-    left: -96,
-    width: 384,
-    height: 384,
-    backgroundColor: 'rgba(0, 63, 177, 0.05)',
-    borderRadius: 192,
+    top: -150,
+    right: -100,
+    width: 350,
+    height: 350,
+    borderRadius: 175,
+    backgroundColor: 'rgba(219, 225, 255, 0.35)',
   },
   bgDecor2: {
     position: 'absolute',
-    bottom: -96,
-    right: -96,
-    width: 480,
-    height: 480,
-    backgroundColor: 'rgba(220, 226, 243, 0.2)',
-    borderRadius: 240,
+    bottom: -120,
+    left: -120,
+    width: 380,
+    height: 380,
+    borderRadius: 190,
+    backgroundColor: 'rgba(235, 237, 248, 0.45)',
   },
   container: {
-    paddingHorizontal: 16,
-    maxWidth: 440,
-    alignSelf: 'center',
     width: '100%',
-    gap: 24,
+    maxWidth: 420,
+    alignSelf: 'center',
   },
   brandHeader: {
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
+    marginBottom: 16,
   },
   logo: {
     width: 64,
     height: 64,
-    borderRadius: 12,
-    marginBottom: 4,
+    marginBottom: 8,
   },
   brandRow: {
     flexDirection: 'row',
@@ -193,56 +265,79 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
   adminBadge: {
-    backgroundColor: Colors.surfaceVariant,
+    backgroundColor: Colors.errorContainer,
     paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
   },
   adminBadgeText: {
-    ...Typography.labelSm,
-    color: Colors.onSurfaceVariant,
-    letterSpacing: 1,
+    color: Colors.error,
+    fontWeight: '700',
+    fontSize: 11,
+    letterSpacing: 0.5,
   },
   brandSubtitle: {
     ...Typography.bodyMd,
-    color: Colors.onSurfaceVariant,
+    color: Colors.secondary,
+    marginTop: 4,
     textAlign: 'center',
-    maxWidth: 280,
   },
   loginCard: {
     backgroundColor: Colors.surfaceContainerLowest,
-    borderRadius: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: 'rgba(195, 197, 215, 0.4)',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
     overflow: 'hidden',
+    padding: 24,
+    paddingTop: 20,
   },
   gradientBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     height: 4,
     backgroundColor: Colors.primary,
   },
-  cardContent: {
-    padding: 24,
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.outlineVariant,
+  },
+  headerIconWrapper: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: Colors.primaryContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTexts: {
+    flex: 1,
   },
   cardTitle: {
-    ...Typography.headlineSm,
+    ...Typography.titleMd,
     color: Colors.onSurface,
-    marginBottom: 16,
+    fontWeight: '600',
   },
-  divider: {
-    height: 1,
-    backgroundColor: 'rgba(195, 197, 215, 0.3)',
-    marginBottom: 16,
+  cardSubtitle: {
+    ...Typography.bodySm,
+    color: Colors.onSurfaceVariant,
   },
   fieldGroup: {
-    marginBottom: 16,
+    marginBottom: 14,
   },
   label: {
-    ...Typography.labelMd,
+    ...Typography.labelSm,
     color: Colors.onSurfaceVariant,
     marginBottom: 4,
   },
@@ -252,16 +347,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 4,
   },
-  requiredBadge: {
-    backgroundColor: Colors.surfaceContainer,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  requiredBadgeText: {
+  forgotLink: {
     ...Typography.labelSm,
-    color: Colors.outline,
-    fontWeight: '400',
+    color: Colors.primary,
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -270,7 +358,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.outlineVariant,
     borderRadius: 8,
-    height: 44,
+    height: 42,
   },
   inputIcon: {
     paddingLeft: 12,
@@ -285,53 +373,78 @@ const styles = StyleSheet.create({
   visibilityButton: {
     paddingRight: 12,
   },
-  optionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 8,
-  },
-  rememberRow: {
+  checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 16,
     gap: 8,
   },
-  rememberText: {
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.outline,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.surface,
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  checkboxLabel: {
     ...Typography.bodyMd,
     color: Colors.onSurfaceVariant,
-  },
-  forgotLink: {
-    ...Typography.labelMd,
-    color: Colors.primary,
+    fontSize: 13,
   },
   submitButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.primary,
-    height: 40,
+    height: 44,
     borderRadius: 8,
     gap: 8,
-    marginTop: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
     elevation: 2,
   },
   submitButtonText: {
     ...Typography.labelMd,
     color: Colors.onPrimary,
+    fontWeight: '700',
+  },
+  commonHubRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 16,
+    paddingVertical: 8,
+    backgroundColor: '#f3f3fe',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#dbe1ff',
+  },
+  commonHubRowText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#003fb1',
   },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    gap: 6,
+    marginTop: 16,
   },
   footerText: {
-    ...Typography.bodyMd,
+    ...Typography.bodySm,
     color: Colors.outline,
+    fontSize: 12,
   },
 });
 
