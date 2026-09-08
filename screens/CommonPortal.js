@@ -788,7 +788,7 @@ export default function CommonPortal({ route, navigation }) {
                 <View style={styles.sectionHeadingLeft}>
 
                   <MaterialIcons
-                    name="event-upcoming"
+                    name="event-available"
                     size={20}
                     color="#003fb1"
                   />
