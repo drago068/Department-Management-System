@@ -11,6 +11,7 @@ import {
   Dimensions,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import StudentBottomNav from "../components/StudentBottomNav";
 
 const { width } = Dimensions.get("window");
 
@@ -636,7 +637,7 @@ export default function StudentAttendanceDetail({ navigation }) {
         <View style={styles.bottomSpace} />
       </ScrollView>
 
-      <BottomNavigation navigation={navigation} />
+      <StudentBottomNav activeTab="attendance" navigation={navigation} />
     </SafeAreaView>
   );
 }

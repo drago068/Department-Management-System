@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
+import StudentBottomNav from '../components/StudentBottomNav';
 
 const COLLEGE_LOGO =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuANdWs9FsNCaoAEBH-d9jjOGNGHTECsPM5IBwpJZ8hGqWi5BU4XLsXoaZhn9Oj3Tl9ZiK4tWrjXASrpYcWSeB-4H5TuTOP_3_F-HFZDDAoTANGqXUs9Itaneg-eQUPrdgkpGTGMcJaBp7mFQkmNSlvLN2wHxfwOnW9oLojQsVvmLjPbV7DiGhYaNHNlHp7CWp-TtswVdW5UDM4P9f_lTYd9BTzywk-v6kHE3bO2smiq3IZsLXaiXBlsChR7BG6NiYKgDw';
@@ -246,38 +247,7 @@ const StudentProfile = ({ navigation }) => {
           <View style={{ height: 90 }} />
         </ScrollView>
 
-        {/* ================= BOTTOM NAVIGATION ================= */}
-        <View style={styles.bottomNavigation}>
-
-          <BottomNavItem
-            icon="dashboard"
-            label="Home"
-            active={false}
-            onPress={() => navigation?.navigate('StudentDashboard')}
-          />
-
-          <BottomNavItem
-            icon="how-to-reg"
-            label="Attendance"
-            active={false}
-            onPress={() => navigation?.navigate('StudentAttendanceDetail')}
-          />
-
-          <BottomNavItem
-            icon="menu-book"
-            label="Materials"
-            active={false}
-            onPress={() => navigation?.navigate('StudyMaterials')}
-          />
-
-          <BottomNavItem
-            icon="person"
-            label="Profile"
-            active={true}
-            onPress={() => {}}
-          />
-
-        </View>
+        <StudentBottomNav activeTab="profile" navigation={navigation} />
       </View>
     </SafeAreaView>
   );

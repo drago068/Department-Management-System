@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
+import StudentBottomNav from "../components/StudentBottomNav";
 
 const COLORS = {
   primary: "#003fb1",
@@ -961,77 +962,7 @@ export default function StudyMaterials({ navigation }) {
         </View>
       </ScrollView>
 
-      {/* Bottom Navigation */}
-      <BlurView
-        intensity={70}
-        tint="light"
-        style={styles.bottomNav}
-      >
-        <View style={styles.bottomNavInner}>
-          <TouchableOpacity
-            style={styles.navItem}
-            activeOpacity={0.7}
-            onPress={() => navigation?.navigate("StudentDashboard")}
-          >
-            <Icon
-              name="dashboard"
-              size={24}
-              color={COLORS.onSurfaceVariant}
-            />
-
-            <Text style={styles.navText}>
-              Home
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.navItem}
-            activeOpacity={0.7}
-            onPress={() => navigation?.navigate("StudentAttendanceDetail")}
-          >
-            <Icon
-              name="how-to-reg"
-              size={24}
-              color={COLORS.onSurfaceVariant}
-            />
-
-            <Text style={styles.navText}>
-              Attendance
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.navItemActive}
-            activeOpacity={0.9}
-          >
-            <Icon
-              name="menu-book"
-              size={24}
-              color={COLORS.primaryContainer}
-            />
-
-            <Text style={styles.navTextActive}>
-              Materials
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.navItem}
-            activeOpacity={0.7}
-            onPress={() => navigation?.navigate("StudentProfile")}
-          >
-            <Icon
-              name="person"
-              size={24}
-              color={COLORS.onSurfaceVariant}
-            />
-
-            <Text style={styles.navText}>
-              Profile
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </BlurView>
+      <StudentBottomNav activeTab="materials" navigation={navigation} />
 
       {/* Reader */}
       <ReaderModal

@@ -14,6 +14,7 @@ import {
   Dimensions,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import StudentBottomNav from "../components/StudentBottomNav";
 
 const { width, height } = Dimensions.get("window");
 
@@ -561,7 +562,7 @@ export default function StudentDashboard({ navigation }) {
         </View>
       </ScrollView>
 
-      <BottomNavigation navigation={navigation} />
+      <StudentBottomNav activeTab="home" navigation={navigation} />
 
       {/* ================= MODALS ================= */}
 
@@ -803,10 +804,10 @@ export default function StudentDashboard({ navigation }) {
               <View style={styles.creditsCard}>
                 <Text style={styles.creditsHeading}>Core Development Team</Text>
                 <Text style={styles.creditsText}>• Gnana Prakash V (AI & DS)</Text>
-                <Text style={styles.creditsText}>• Esakki Muthu (AI & DS)</Text>
-                <Text style={styles.creditsText}>• Abishek (AI & DS)</Text>
+                <Text style={styles.creditsText}>• Esakki Muthu M (AI & DS)</Text>
+                <Text style={styles.creditsText}>• Abishek R K (AI & DS)</Text>
                 <Text style={[styles.creditsHeading, { marginTop: 8 }]}>Faculty Mentors</Text>
-                <Text style={styles.creditsText}>• Dr. Sarah Williams, HOD AI & DS</Text>
+                <Text style={styles.creditsText}>• Mr. Vasanth V, HOD AI & DS</Text>
                 <Text style={styles.creditsText}>• Dr. Arulprakash P, Associate Professor</Text>
               </View>
             </ScrollView>

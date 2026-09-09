@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, SafeAreaView, ScrollView, Linking } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Colors from '../constants/colors';
 import Typography from '../constants/typography';
 
 const LoginPage = ({ navigation }) => {
   const [selectedRole, setSelectedRole] = useState('student');
+
+  const handleContactAdmin = () => {
+    Linking.openURL('https://forms.gle/7P3vJnbaiFs8qHVJA').catch((err) =>
+      console.log('Could not open contact form URL', err)
+    );
+  };
 
   const roles = [
     { key: 'student', label: 'Student', icon: 'school' },
@@ -117,35 +123,22 @@ const LoginPage = ({ navigation }) => {
               {/* Footer */}
               <View style={styles.footer}>
                 <View style={styles.footerDivider} />
-                <View style={styles.footerContent}>
+                <TouchableOpacity
+                  style={styles.footerContent}
+                  onPress={handleContactAdmin}
+                  activeOpacity={0.7}
+                >
                   <MaterialIcons name="help-outline" size={14} color={Colors.onSurfaceVariant} />
                   <Text style={styles.footerText}>
                     Need help?{' '}
                     <Text style={styles.footerLink}>Contact Dept. Admin</Text>
                   </Text>
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
         </View>
       </ScrollView>
-
-      {/* Bottom Navigation Bar */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.bottomBarItemActive} activeOpacity={0.9}>
-          <MaterialIcons name="lock" size={20} color="#003fb1" />
-          <Text style={styles.bottomBarTextActive}>Login Portals</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.bottomBarItem}
-          onPress={() => navigation.navigate('CommonPortal')}
-          activeOpacity={0.7}
-        >
-          <MaterialIcons name="public" size={20} color="#64748b" />
-          <Text style={styles.bottomBarText}>Campus Hub</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 };
@@ -204,7 +197,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     paddingVertical: 24,
-    paddingBottom: 80,
+    paddingBottom: 24,
   },
   container: {
     alignItems: 'center',
