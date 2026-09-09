@@ -1,194 +1,1314 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import Colors from '../constants/colors';
-import Typography from '../constants/typography';
-import TopAppBar from '../components/TopAppBar';
-import BottomNavBar from '../components/BottomNavBar';
+import React from "react";
+import {
+  SafeAreaView,
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  StatusBar,
+  Dimensions,
+} from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
-const StudentAttendanceDetail = ({ navigation }) => {
-  const [selectedSubject, setSelectedSubject] = useState('all');
+const { width } = Dimensions.get("window");
 
-  const subjects = [
-    { key: 'all', label: 'All Subjects' },
-    { key: 'cs301', label: 'CS301' },
-    { key: 'cs302', label: 'CS302' },
-    { key: 'cs303', label: 'CS303' },
-  ];
+const CREST_URL =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuANdWs9FsNCaoAEBH-d9jjOGNGHTECsPM5IBwpJZ8hGqWi5BU4XLsXoaZhn9Oj3Tl9ZiK4tWrjXASrpYcWSeB-4H5TuTOP_3_F-HFZDDAoTANGqXUs9Itaneg-eQUPrdgkpGTGMcJaBp7mFQkmNSlvLN2wHxfwOnW9oLojQsVvmLjPbV7DiGhYaNHNlHp7CWp-TtswVdW5UDM4P9f_lTYd9BTzywk-v6kHE3bO2smiq3IZsLXaiXBlsChR7BG6NiYKgDw";
 
-  const attendanceLog = [
-    { date: 'Sep 6, 2024', subject: 'Data Structures (CS301)', period: 'Period 1', status: 'present' },
-    { date: 'Sep 6, 2024', subject: 'Algorithms (CS302)', period: 'Period 2', status: 'present' },
-    { date: 'Sep 6, 2024', subject: 'DBMS (CS303)', period: 'Period 3', status: 'absent' },
-    { date: 'Sep 5, 2024', subject: 'Data Structures (CS301)', period: 'Period 1', status: 'present' },
-    { date: 'Sep 5, 2024', subject: 'Algorithms (CS302)', period: 'Period 2', status: 'present' },
-    { date: 'Sep 5, 2024', subject: 'DBMS (CS303)', period: 'Period 3', status: 'od' },
-    { date: 'Sep 4, 2024', subject: 'Data Structures (CS301)', period: 'Period 1', status: 'present' },
-    { date: 'Sep 4, 2024', subject: 'Algorithms (CS302)', period: 'Period 2', status: 'absent' },
-    { date: 'Sep 4, 2024', subject: 'DBMS (CS303)', period: 'Period 3', status: 'present' },
-  ];
+const STUDENT_IMAGE =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuCVXP3laCjvBlZEVugtzpX20kCifG87-9yGGVWnUCmaIhNtCcDdG9HmCKcyaSa4oTc-QPnHNb5RR_pO0Xd8oVLNtxyVdxbttBW5KjbrzMiMJD0HcqApHxFuVbC5_KEUHnW0qOr98kurfIJ2NAVvw464MLzvDAN8LdJTSZXSqkbDkysN8V9Lzled9wZvQVwVorYcKfLMT1do8whwEUyopOcVpVMNt3wTCpl8mQ00dAziqalPOmZQTqcZ";
 
-  const subjectStats = [
-    { name: 'Data Structures', code: 'CS301', present: 42, total: 45, percentage: 93 },
-    { name: 'Algorithms', code: 'CS302', present: 38, total: 45, percentage: 84 },
-    { name: 'DBMS', code: 'CS303', present: 35, total: 45, percentage: 78 },
-  ];
+const COLORS = {
+  background: "#faf8ff",
+  surfaceLow: "#f3f3fe",
+  surface: "#ffffff",
+  surfaceHigh: "#e7e7f3",
+  surfaceHighest: "#e2e1ed",
+  primary: "#003fb1",
+  primaryContainer: "#1a56db",
+  secondary: "#585f6c",
+  text: "#191b23",
+  textVariant: "#434654",
+  outline: "#737686",
+  error: "#ba1a1a",
+  tertiary: "#ad3b00",
+};
 
-  const statusConfig = {
-    present: { bg: '#dcfce7', text: '#166534', label: 'Present', icon: 'check-circle' },
-    absent: { bg: '#fee2e2', text: '#b91c1c', label: 'Absent', icon: 'cancel' },
-    od: { bg: '#ffedd5', text: '#c2410c', label: 'OD', icon: 'assignment-ind' },
-  };
+const subjects = [
+  {
+    code: "CS3351",
+    credits: "4 Credits",
+    name: "Machine Learning",
+    staff: "Dr. S. Karthikeyan, Asso. Prof",
+    percentage: "92.5%",
+    hours: "37 / 40 hrs",
+    progress: 92.5,
+    status: "Status: Excellent",
+    note: "Max Absences Allowed: 3 more",
+    color: COLORS.primary,
+  },
+  {
+    code: "AD3401",
+    credits: "3 Credits",
+    name: "Deep Learning & Neural Nets",
+    staff: "Prof. R. Menaka, AP",
+    percentage: "85.0%",
+    hours: "34 / 40 hrs",
+    progress: 85,
+    status: "Status: Good",
+    note: "Max Absences Allowed: 2 more",
+    color: COLORS.primaryContainer,
+  },
+  {
+    code: "MA3354",
+    credits: "4 Credits",
+    name: "Discrete Mathematics",
+    staff: "Dr. M. Soundararajan, Prof",
+    percentage: "82.5%",
+    hours: "33 / 40 hrs",
+    progress: 82.5,
+    status: "Status: Safe",
+    note: "Needs 1 class for 85%",
+    color: COLORS.secondary,
+  },
+  {
+    code: "CS3391",
+    credits: "3 Credits",
+    name: "Object Oriented Programming",
+    staff: "Er. Priya V, Assistant Prof",
+    percentage: "90.0%",
+    hours: "36 / 40 hrs",
+    progress: 90,
+    status: "Status: Excellent",
+    note: "Max Absences Allowed: 3 more",
+    color: COLORS.primary,
+  },
+  {
+    code: "AD3411",
+    credits: "2 Credits (Practical)",
+    name: "AI Laboratory & Practicum",
+    staff: "Dr. S. Karthikeyan & Lab Staff",
+    percentage: "95.0%",
+    hours: "19 / 20 labs",
+    progress: 95,
+    status: "Status: Outstanding",
+    note: "Full Internal Lab Marks Eligible",
+    color: COLORS.primary,
+  },
+];
 
-  const bottomNavItems = [
-    { key: 'home', label: 'Home', icon: 'dashboard' },
-    { key: 'attendance', label: 'Attendance', icon: 'how-to-reg' },
-    { key: 'history', label: 'History', icon: 'calendar-month' },
-    { key: 'profile', label: 'Profile', icon: 'person' },
+function Header({ navigation }) {
+  return (
+    <View style={styles.header}>
+      <View style={styles.headerLeft}>
+        <TouchableOpacity
+          style={styles.backButton}
+          activeOpacity={0.8}
+          onPress={() => {
+            if (navigation && navigation.canGoBack()) navigation.goBack();
+            else navigation?.navigate("StudentDashboard");
+          }}
+        >
+          <MaterialIcons name="arrow-back" size={22} color={COLORS.text} />
+        </TouchableOpacity>
+
+        <View style={styles.logoBox}>
+          <Image source={{ uri: CREST_URL }} style={styles.logo} />
+        </View>
+
+        <View style={styles.headerText}>
+          <View style={styles.titleRow}>
+            <Text style={styles.nexus}>NEXUS</Text>
+            <Text style={styles.attendanceTitle}>· Attendance</Text>
+          </View>
+
+          <Text style={styles.subtitle}>
+            Student Academic Portal
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.headerRight}>
+        <TouchableOpacity
+          style={styles.notificationButton}
+          activeOpacity={0.8}
+          onPress={() => navigation?.navigate("StudentProfile")}
+        >
+          <MaterialIcons
+            name="notifications"
+            size={23}
+            color={COLORS.textVariant}
+          />
+
+          <View style={styles.notificationDot} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => navigation?.navigate("StudentProfile")}
+        >
+          <Image source={{ uri: STUDENT_IMAGE }} style={styles.profileSmall} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+function StudentIdentity() {
+  return (
+    <View style={styles.identityCard}>
+      <View style={styles.identityTop}>
+        <View style={styles.studentInfo}>
+          <View style={styles.studentImageContainer}>
+            <Image
+              source={{ uri: STUDENT_IMAGE }}
+              style={styles.studentImage}
+            />
+
+            <View style={styles.verifiedDot}>
+              <MaterialIcons
+                name="verified"
+                size={10}
+                color="#fff"
+              />
+            </View>
+          </View>
+
+          <View style={styles.studentText}>
+            <Text style={styles.studentName}>
+              Gnana Prakash V
+            </Text>
+
+            <Text style={styles.registerNumber}>
+              REG: 714022243018
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.semesterContainer}>
+          <View style={styles.semesterBadge}>
+            <Text style={styles.semesterText}>
+              Sem 5 · Sec A
+            </Text>
+          </View>
+
+          <Text style={styles.academicYear}>
+            AY 2024–2025
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.metadataGrid}>
+        <View style={styles.metadataItem}>
+          <MaterialIcons
+            name="school"
+            size={18}
+            color={COLORS.primary}
+          />
+
+          <View style={{ marginLeft: 6 }}>
+            <Text style={styles.metadataLabel}>
+              DEPARTMENT
+            </Text>
+            <Text style={styles.metadataValue}>
+              B.Tech AI & DS
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.metadataItem}>
+          <MaterialIcons
+            name="account-balance"
+            size={18}
+            color={COLORS.primary}
+          />
+
+          <View style={{ marginLeft: 6 }}>
+            <Text style={styles.metadataLabel}>
+              INSTITUTION
+            </Text>
+            <Text style={styles.metadataValue}>
+              Suguna CE (R-2021)
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function AttendanceGauge() {
+  return (
+    <View style={styles.gaugeWrapper}>
+      <View style={styles.gaugeOuter}>
+        <View style={styles.gaugeTrack}>
+          <View style={styles.gaugeProgress}>
+            <View style={styles.gaugeInner} />
+          </View>
+        </View>
+
+        <View style={styles.gaugeText}>
+          <Text style={styles.gaugePercentage}>88.4%</Text>
+          <Text style={styles.aggregate}>AGGREGATE</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function MetricBox({
+  label,
+  value,
+  description,
+  color = COLORS.text,
+}) {
+  return (
+    <View style={styles.metricBox}>
+      <Text style={[styles.metricLabel, { color }]}>
+        {label}
+      </Text>
+
+      <Text style={[styles.metricValue, { color }]}>
+        {value}
+      </Text>
+
+      <Text style={styles.metricDescription}>
+        {description}
+      </Text>
+    </View>
+  );
+}
+
+function AttendanceCard() {
+  return (
+    <View style={styles.attendanceCard}>
+      <View style={styles.attendanceHeader}>
+        <View>
+          <Text style={styles.sectionLabel}>
+            CUMULATIVE ATTENDANCE
+          </Text>
+
+          <Text style={styles.dateText}>
+            Through Oct 24, 2024
+          </Text>
+        </View>
+
+        <View style={styles.safeBadge}>
+          <View style={styles.safeDot} />
+
+          <Text style={styles.safeText}>
+            Safe Zone
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.gaugeStatsRow}>
+        <AttendanceGauge />
+
+        <View style={styles.metricGrid}>
+          <MetricBox
+            label="Working Days"
+            value="68"
+            description="Total active"
+          />
+
+          <MetricBox
+            label="Attended"
+            value="60"
+            description="88.2% present"
+            color={COLORS.primary}
+          />
+
+          <MetricBox
+            label="Absences"
+            value="04"
+            description="Medical allowed"
+            color={COLORS.error}
+          />
+
+          <MetricBox
+            label="On-Duty (OD)"
+            value="04"
+            description="Sanctioned"
+            color={COLORS.tertiary}
+          />
+        </View>
+      </View>
+
+      <View style={styles.eligibilityBanner}>
+        <View style={styles.eligibilityIcon}>
+          <MaterialIcons
+            name="verified-user"
+            size={18}
+            color="#fff"
+          />
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <Text style={styles.eligibilityTitle}>
+            75% AU Mandatory Criteria Satisfied
+          </Text>
+
+          <Text style={styles.eligibilitySubtitle}>
+            Eligible for End-Semester Exam Hall Ticket
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.runwayBox}>
+        <MaterialIcons
+          name="lightbulb"
+          size={20}
+          color={COLORS.textVariant}
+        />
+
+        <View style={{ flex: 1, marginLeft: 8 }}>
+          <Text style={styles.runwayTitle}>
+            Attendance Runway Safety
+          </Text>
+
+          <Text style={styles.runwayText}>
+            You can miss up to{" "}
+            <Text style={styles.highlight}>
+              6 more periods
+            </Text>{" "}
+            without slipping below the required 75.0% threshold.
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function SubjectCard({ subject }) {
+  return (
+    <View style={styles.subjectCard}>
+      <View style={styles.subjectTop}>
+        <View style={{ flex: 1, paddingRight: 10 }}>
+          <View style={styles.codeRow}>
+            <Text style={styles.subjectCode}>
+              {subject.code}
+            </Text>
+
+            <Text style={styles.creditText}>
+              · {subject.credits}
+            </Text>
+          </View>
+
+          <Text style={styles.subjectName}>
+            {subject.name}
+          </Text>
+
+          <Text style={styles.staffName}>
+            {subject.staff}
+          </Text>
+        </View>
+
+        <View style={styles.percentageBox}>
+          <Text
+            style={[
+              styles.subjectPercentage,
+              {
+                color:
+                  subject.code === "MA3354"
+                    ? COLORS.text
+                    : COLORS.primary,
+              },
+            ]}
+          >
+            {subject.percentage}
+          </Text>
+
+          <Text style={styles.hoursText}>
+            {subject.hours}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.progressBackground}>
+        <View
+          style={[
+            styles.progressFill,
+            {
+              width: `${subject.progress}%`,
+              backgroundColor: subject.color,
+            },
+          ]}
+        />
+      </View>
+
+      <View style={styles.subjectFooter}>
+        <Text
+          style={[
+            styles.statusText,
+            { color: subject.color },
+          ]}
+        >
+          {subject.status}
+        </Text>
+
+        <Text style={styles.absenceText}>
+          {subject.note}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+function SubjectSection() {
+  return (
+    <View style={styles.subjectSection}>
+      <View style={styles.subjectSectionHeader}>
+        <View style={styles.subjectTitleRow}>
+          <MaterialIcons
+            name="analytics"
+            size={20}
+            color={COLORS.primary}
+          />
+
+          <Text style={styles.subjectSectionTitle}>
+            Subject-Wise Record
+          </Text>
+        </View>
+
+        <Text style={styles.subjectCount}>
+          5 Subjects
+        </Text>
+      </View>
+
+      {subjects.map((subject) => (
+        <SubjectCard
+          key={subject.code}
+          subject={subject}
+        />
+      ))}
+    </View>
+  );
+}
+
+function Regulations() {
+  return (
+    <View style={styles.regulations}>
+      <View style={styles.regulationTitleRow}>
+        <MaterialIcons
+          name="info"
+          size={20}
+          color={COLORS.primary}
+        />
+
+        <Text style={styles.regulationTitle}>
+          Anna University R-2021 Regulations
+        </Text>
+      </View>
+
+      <Text style={styles.regulationText}>
+        Every student must secure minimum{" "}
+        <Text style={styles.bold}>
+          75% attendance
+        </Text>{" "}
+        to register for end-semester exams. Attendance between{" "}
+        <Text style={styles.bold}>
+          65% and 74%
+        </Text>{" "}
+        allows Condonation strictly on certified medical grounds or
+        authorized sports/symposia. Below 65% results in detention.
+      </Text>
+
+      <View style={styles.regulationFooter}>
+        <Text style={styles.cellText}>
+          Suguna CE Academic Monitoring Cell
+        </Text>
+
+        <TouchableOpacity style={styles.handbookButton} activeOpacity={0.7}>
+          <Text style={styles.handbookText}>
+            Read Handbook
+          </Text>
+
+          <MaterialIcons
+            name="arrow-forward"
+            size={14}
+            color={COLORS.primary}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+function BottomNavigation({ navigation }) {
+  const items = [
+    {
+      key: "home",
+      icon: "dashboard",
+      label: "Home",
+      active: false,
+    },
+    {
+      key: "attendance",
+      icon: "how-to-reg",
+      label: "Attendance",
+      active: true,
+    },
+    {
+      key: "materials",
+      icon: "menu-book",
+      label: "Materials",
+      active: false,
+    },
+    {
+      key: "profile",
+      icon: "person",
+      label: "Profile",
+      active: false,
+    },
   ];
 
   return (
+    <View style={styles.bottomNav}>
+      {items.map((item) => (
+        <TouchableOpacity
+          key={item.label}
+          style={styles.navItem}
+          activeOpacity={0.7}
+          onPress={() => {
+            if (item.key === "home") navigation?.navigate("StudentDashboard");
+            else if (item.key === "attendance") navigation?.navigate("StudentAttendanceDetail");
+            else if (item.key === "materials") navigation?.navigate("StudyMaterials");
+            else if (item.key === "profile") navigation?.navigate("StudentProfile");
+          }}
+        >
+          <MaterialIcons
+            name={item.icon}
+            size={24}
+            color={
+              item.active
+                ? COLORS.primary
+                : COLORS.textVariant
+            }
+          />
+
+          <Text
+            style={[
+              styles.navLabel,
+              {
+                color: item.active
+                  ? COLORS.primary
+                  : COLORS.textVariant,
+                fontWeight: item.active
+                  ? "600"
+                  : "500",
+              },
+            ]}
+          >
+            {item.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
+
+export default function StudentAttendanceDetail({ navigation }) {
+  return (
     <SafeAreaView style={styles.safeArea}>
-      <TopAppBar
-        title="Attendance Detail"
-        showBack
-        onBackPress={() => {
-          if (navigation && navigation.canGoBack()) navigation.goBack();
-          else navigation?.navigate('StudentDashboard');
-        }}
-        onProfilePress={() => navigation?.navigate('StudentProfile')}
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor={COLORS.background}
       />
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.contentInner}>
-          {/* Page Header */}
-          <View>
-            <Text style={styles.pageTitle}>Attendance Details</Text>
-            <Text style={styles.pageSubtitle}>Your detailed attendance records by subject and date.</Text>
-          </View>
 
-          {/* Subject-wise Summary */}
-          <View style={styles.summarySection}>
-            <Text style={styles.sectionTitle}>Subject Summary</Text>
-            {subjectStats.map((subj, index) => (
-              <View key={index} style={styles.subjectSummaryCard}>
-                <View style={styles.subjectSummaryHeader}>
-                  <View>
-                    <Text style={styles.subjectName}>{subj.name}</Text>
-                    <Text style={styles.subjectCode}>{subj.code}</Text>
-                  </View>
-                  <Text style={[styles.subjectPercentage, { color: subj.percentage >= 75 ? '#16a34a' : Colors.error }]}>
-                    {subj.percentage}%
-                  </Text>
-                </View>
-                <View style={styles.subjectStatsRow}>
-                  <Text style={styles.subjectStatText}>{subj.present}/{subj.total} sessions</Text>
-                </View>
-                <View style={styles.progressBarBg}>
-                  <View style={[styles.progressBarFill, {
-                    width: `${subj.percentage}%`,
-                    backgroundColor: subj.percentage >= 75 ? '#22c55e' : Colors.error,
-                  }]} />
-                </View>
-              </View>
-            ))}
-          </View>
+      <Header navigation={navigation} />
 
-          {/* Subject Filter */}
-          <View style={styles.filterRow}>
-            {subjects.map((s) => (
-              <TouchableOpacity
-                key={s.key}
-                style={[styles.filterChip, selectedSubject === s.key && styles.filterChipActive]}
-                onPress={() => setSelectedSubject(s.key)}
-              >
-                <Text style={[styles.filterText, selectedSubject === s.key && styles.filterTextActive]}>{s.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <StudentIdentity />
 
-          {/* Attendance Log */}
-          <View style={styles.logCard}>
-            <Text style={styles.sectionTitle}>Daily Log</Text>
-            {attendanceLog.map((entry, index) => {
-              const sc = statusConfig[entry.status];
-              return (
-                <View key={index} style={styles.logEntry}>
-                  <View style={styles.logLeft}>
-                    <Text style={styles.logDate}>{entry.date}</Text>
-                    <Text style={styles.logSubject}>{entry.subject}</Text>
-                    <Text style={styles.logPeriod}>{entry.period}</Text>
-                  </View>
-                  <View style={[styles.logStatusBadge, { backgroundColor: sc.bg }]}>
-                    <MaterialIcons name={sc.icon} size={14} color={sc.text} />
-                    <Text style={[styles.logStatusText, { color: sc.text }]}>{sc.label}</Text>
-                  </View>
-                </View>
-              );
-            })}
-          </View>
-        </View>
+        <AttendanceCard />
+
+        <SubjectSection />
+
+        <Regulations />
+
+        <View style={styles.bottomSpace} />
       </ScrollView>
-      <BottomNavBar
-        items={bottomNavItems}
-        activeItem="attendance"
-        onItemPress={(item) => {
-          if (item.key === 'home') navigation?.navigate('StudentDashboard');
-          else if (item.key === 'attendance') navigation?.navigate('StudentAttendanceDetail');
-          else if (item.key === 'history') navigation?.navigate('AttendanceHistory');
-          else if (item.key === 'profile') navigation?.navigate('StudentProfile');
-        }}
-      />
+
+      <BottomNavigation navigation={navigation} />
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.background },
-  content: { flex: 1 },
-  contentInner: { padding: 16, paddingBottom: 80, gap: 16 },
-  pageTitle: { ...Typography.headlineLgMobile, color: Colors.onBackground },
-  pageSubtitle: { ...Typography.bodyMd, color: Colors.onSurfaceVariant, marginTop: 4 },
-  sectionTitle: { ...Typography.headlineSm, color: Colors.onSurface, marginBottom: 8 },
-  summarySection: {
-    backgroundColor: Colors.surfaceContainerLowest, borderRadius: 12, padding: 16,
-    borderWidth: 1, borderColor: 'rgba(195,197,215,0.3)', gap: 12,
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
   },
-  subjectSummaryCard: {
-    padding: 12, borderRadius: 8, backgroundColor: Colors.surfaceContainerLow, gap: 8,
-  },
-  subjectSummaryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  subjectName: { ...Typography.labelMd, color: Colors.onSurface, fontWeight: '600' },
-  subjectCode: { ...Typography.labelSm, color: Colors.onSurfaceVariant, fontWeight: '400' },
-  subjectPercentage: { ...Typography.headlineMd, fontWeight: '700' },
-  subjectStatsRow: { flexDirection: 'row' },
-  subjectStatText: { ...Typography.bodyMd, color: Colors.onSurfaceVariant, fontSize: 12 },
-  progressBarBg: { height: 6, backgroundColor: Colors.surfaceContainerHighest, borderRadius: 3 },
-  progressBarFill: { height: 6, borderRadius: 3 },
-  filterRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  filterChip: {
-    paddingHorizontal: 14, paddingVertical: 6, borderRadius: 9999,
-    backgroundColor: Colors.surfaceContainerLow, borderWidth: 1, borderColor: Colors.outlineVariant,
-  },
-  filterChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  filterText: { ...Typography.labelSm, color: Colors.onSurfaceVariant },
-  filterTextActive: { color: Colors.onPrimary },
-  logCard: {
-    backgroundColor: Colors.surfaceContainerLowest, borderRadius: 12, padding: 16,
-    borderWidth: 1, borderColor: 'rgba(195,197,215,0.3)', gap: 8,
-  },
-  logEntry: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(195,197,215,0.2)',
-  },
-  logLeft: { flex: 1 },
-  logDate: { ...Typography.labelSm, color: Colors.onSurfaceVariant, fontWeight: '400' },
-  logSubject: { ...Typography.labelMd, color: Colors.onSurface, marginTop: 2 },
-  logPeriod: { ...Typography.bodyMd, color: Colors.onSurfaceVariant, fontSize: 12, marginTop: 2 },
-  logStatusBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999,
-  },
-  logStatusText: { fontSize: 12, fontWeight: '500' },
-});
 
-export default StudentAttendanceDetail;
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+
+  contentContainer: {
+    paddingTop: 78,
+    paddingHorizontal: 16,
+    paddingBottom: 90,
+  },
+
+  header: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 70,
+    zIndex: 20,
+    elevation: 8,
+    backgroundColor: COLORS.background,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.03)",
+  },
+
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 6,
+    backgroundColor: COLORS.surfaceHigh,
+  },
+
+  logoBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: COLORS.surfaceLow,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 2,
+  },
+
+  logo: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+  },
+
+  headerText: {
+    marginLeft: 8,
+    flex: 1,
+  },
+
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  nexus: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: COLORS.primary,
+  },
+
+  attendanceTitle: {
+    fontSize: 12,
+    color: COLORS.textVariant,
+    marginLeft: 4,
+    fontWeight: "500",
+  },
+
+  subtitle: {
+    fontSize: 10,
+    color: COLORS.textVariant,
+    marginTop: 1,
+  },
+
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  notificationButton: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 20,
+    position: "relative",
+  },
+
+  notificationDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: COLORS.error,
+    position: "absolute",
+    top: 8,
+    right: 8,
+  },
+
+  profileSmall: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginLeft: 6,
+    backgroundColor: COLORS.surfaceHigh,
+  },
+
+  identityCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 14,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+
+  identityTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+
+  studentInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+
+  studentImageContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: COLORS.surfaceHigh,
+    position: "relative",
+  },
+
+  studentImage: {
+    width: "100%",
+    height: "100%",
+  },
+
+  verifiedDot: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: COLORS.primary,
+    position: "absolute",
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  studentText: {
+    marginLeft: 12,
+    flex: 1,
+  },
+
+  studentName: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: COLORS.text,
+  },
+
+  registerNumber: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: COLORS.textVariant,
+    marginTop: 2,
+    letterSpacing: 0.5,
+  },
+
+  semesterContainer: {
+    alignItems: "flex-end",
+  },
+
+  semesterBadge: {
+    backgroundColor: COLORS.surfaceHigh,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+  },
+
+  semesterText: {
+    fontSize: 11,
+    color: COLORS.primary,
+    fontWeight: "600",
+  },
+
+  academicYear: {
+    fontSize: 11,
+    color: COLORS.textVariant,
+    marginTop: 4,
+  },
+
+  metadataGrid: {
+    flexDirection: "row",
+    backgroundColor: COLORS.surfaceLow,
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 14,
+  },
+
+  metadataItem: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  metadataLabel: {
+    fontSize: 9,
+    color: COLORS.textVariant,
+    letterSpacing: 1,
+    marginBottom: 2,
+  },
+
+  metadataValue: {
+    fontSize: 13,
+    color: COLORS.text,
+    fontWeight: "600",
+  },
+
+  attendanceCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 12,
+    padding: 18,
+    marginBottom: 18,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+
+  attendanceHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  sectionLabel: {
+    fontSize: 11,
+    color: COLORS.textVariant,
+    fontWeight: "600",
+    letterSpacing: 1,
+  },
+
+  dateText: {
+    fontSize: 13,
+    color: COLORS.textVariant,
+    marginTop: 3,
+  },
+
+  safeBadge: {
+    backgroundColor: COLORS.surfaceHigh,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  safeDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.primary,
+    marginRight: 6,
+  },
+
+  safeText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: COLORS.primary,
+  },
+
+  gaugeStatsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 15,
+  },
+
+  gaugeWrapper: {
+    width: 120,
+    height: 120,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  gaugeOuter: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  },
+
+  gaugeTrack: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    borderWidth: 10,
+    borderColor: COLORS.surfaceHigh,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  gaugeProgress: {
+    position: "absolute",
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    borderWidth: 10,
+    borderColor: COLORS.primaryContainer,
+    borderRightColor: "transparent",
+    borderBottomColor: "transparent",
+    transform: [{ rotate: "35deg" }],
+  },
+
+  gaugeInner: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.surface,
+  },
+
+  gaugeText: {
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  gaugePercentage: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: COLORS.text,
+  },
+
+  aggregate: {
+    fontSize: 8,
+    fontWeight: "600",
+    color: COLORS.textVariant,
+    marginTop: 2,
+    letterSpacing: 0.5,
+  },
+
+  metricGrid: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginLeft: 8,
+  },
+
+  metricBox: {
+    width: "48%",
+    backgroundColor: COLORS.surfaceLow,
+    borderRadius: 8,
+    padding: 8,
+    margin: "1%",
+  },
+
+  metricLabel: {
+    fontSize: 10,
+    fontWeight: "500",
+  },
+
+  metricValue: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: 2,
+  },
+
+  metricDescription: {
+    fontSize: 9,
+    color: COLORS.textVariant,
+    marginTop: 1,
+  },
+
+  eligibilityBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.surfaceHigh,
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 14,
+  },
+
+  eligibilityIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+
+  eligibilityTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: COLORS.primary,
+  },
+
+  eligibilitySubtitle: {
+    fontSize: 11,
+    color: COLORS.textVariant,
+    marginTop: 2,
+  },
+
+  runwayBox: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    backgroundColor: COLORS.surfaceLow,
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 10,
+  },
+
+  runwayTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: COLORS.text,
+  },
+
+  runwayText: {
+    fontSize: 12,
+    lineHeight: 18,
+    color: COLORS.textVariant,
+    marginTop: 3,
+  },
+
+  highlight: {
+    color: COLORS.primary,
+    fontWeight: "600",
+  },
+
+  subjectSection: {
+    marginBottom: 18,
+  },
+
+  subjectSectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+
+  subjectTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  subjectSectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: COLORS.text,
+    marginLeft: 8,
+  },
+
+  subjectCount: {
+    fontSize: 12,
+    color: COLORS.primary,
+    fontWeight: "600",
+  },
+
+  subjectCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    elevation: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+
+  subjectTop: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
+  codeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  subjectCode: {
+    fontSize: 12,
+    color: COLORS.primary,
+    fontWeight: "700",
+  },
+
+  creditText: {
+    fontSize: 12,
+    color: COLORS.textVariant,
+    marginLeft: 4,
+  },
+
+  subjectName: {
+    fontSize: 15,
+    color: COLORS.text,
+    fontWeight: "600",
+    marginTop: 3,
+  },
+
+  staffName: {
+    fontSize: 12,
+    color: COLORS.textVariant,
+    marginTop: 3,
+  },
+
+  percentageBox: {
+    alignItems: "flex-end",
+  },
+
+  subjectPercentage: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+
+  hoursText: {
+    fontSize: 11,
+    color: COLORS.textVariant,
+    marginTop: 2,
+  },
+
+  progressBackground: {
+    width: "100%",
+    height: 8,
+    borderRadius: 5,
+    backgroundColor: COLORS.surfaceHigh,
+    overflow: "hidden",
+    marginTop: 12,
+  },
+
+  progressFill: {
+    height: "100%",
+    borderRadius: 5,
+  },
+
+  subjectFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 7,
+  },
+
+  statusText: {
+    fontSize: 11,
+    fontWeight: "500",
+  },
+
+  absenceText: {
+    fontSize: 11,
+    color: COLORS.textVariant,
+    flex: 1,
+    textAlign: "right",
+    marginLeft: 10,
+  },
+
+  regulations: {
+    backgroundColor: COLORS.surfaceLow,
+    borderRadius: 12,
+    padding: 16,
+  },
+
+  regulationTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  regulationTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: COLORS.text,
+    marginLeft: 7,
+  },
+
+  regulationText: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: COLORS.textVariant,
+    marginTop: 10,
+  },
+
+  bold: {
+    fontWeight: "700",
+    color: COLORS.text,
+  },
+
+  regulationFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 12,
+  },
+
+  cellText: {
+    fontSize: 11,
+    color: COLORS.textVariant,
+    flex: 1,
+  },
+
+  handbookButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  handbookText: {
+    color: COLORS.primary,
+    fontSize: 12,
+    fontWeight: "600",
+    marginRight: 3,
+  },
+
+  bottomNav: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 70,
+    backgroundColor: COLORS.background,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.surfaceHigh,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    elevation: 15,
+  },
+
+  navItem: {
+    width: 75,
+    height: 55,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  navLabel: {
+    fontSize: 10,
+    marginTop: 3,
+  },
+
+  bottomSpace: {
+    height: 20,
+  },
+});

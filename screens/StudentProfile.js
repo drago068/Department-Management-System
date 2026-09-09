@@ -264,10 +264,10 @@ const StudentProfile = ({ navigation }) => {
           />
 
           <BottomNavItem
-            icon="calendar-month"
-            label="History"
+            icon="menu-book"
+            label="Materials"
             active={false}
-            onPress={() => navigation?.navigate('AttendanceHistory')}
+            onPress={() => navigation?.navigate('StudyMaterials')}
           />
 
           <BottomNavItem
