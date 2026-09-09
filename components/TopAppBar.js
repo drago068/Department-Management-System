@@ -4,22 +4,38 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Colors from '../constants/colors';
 import Typography from '../constants/typography';
 
-const TopAppBar = ({ title, profileImage, onNotificationPress, onMenuPress, showMenu }) => {
+const TopAppBar = ({
+  title,
+  profileImage,
+  onNotificationPress,
+  onMenuPress,
+  showMenu,
+  showBack,
+  onBackPress,
+  onProfilePress,
+}) => {
   return (
     <View style={styles.container}>
       <View style={styles.leftSection}>
-        {showMenu && (
-          <TouchableOpacity onPress={onMenuPress} style={styles.iconButton}>
+        {showBack && (
+          <TouchableOpacity onPress={onBackPress} style={styles.iconButton} activeOpacity={0.7}>
+            <MaterialIcons name="arrow-back" size={24} color={Colors.onSurface} />
+          </TouchableOpacity>
+        )}
+        {showMenu && !showBack && (
+          <TouchableOpacity onPress={onMenuPress} style={styles.iconButton} activeOpacity={0.7}>
             <MaterialIcons name="menu" size={24} color={Colors.onSurface} />
           </TouchableOpacity>
         )}
         {profileImage && (
-          <Image source={{ uri: profileImage }} style={styles.profileImage} />
+          <TouchableOpacity onPress={onProfilePress} activeOpacity={0.8}>
+            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+          </TouchableOpacity>
         )}
         <Text style={styles.title}>{title || 'NEXUS'}</Text>
       </View>
       <View style={styles.rightSection}>
-        <TouchableOpacity onPress={onNotificationPress} style={styles.iconButton}>
+        <TouchableOpacity onPress={onNotificationPress} style={styles.iconButton} activeOpacity={0.7}>
           <MaterialIcons name="notifications" size={24} color={Colors.primary} />
         </TouchableOpacity>
       </View>

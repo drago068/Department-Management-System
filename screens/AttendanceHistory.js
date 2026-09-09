@@ -36,7 +36,14 @@ const AttendanceHistory = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <TopAppBar title="Attendance History" />
+      <TopAppBar
+        title="Attendance History"
+        showBack
+        onBackPress={() => {
+          if (navigation && navigation.canGoBack()) navigation.goBack();
+          else navigation?.navigate('StudentDashboard');
+        }}
+      />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.contentInner}>
           {/* Page Header */}
@@ -111,7 +118,16 @@ const AttendanceHistory = ({ navigation }) => {
           ))}
         </View>
       </ScrollView>
-      <BottomNavBar items={bottomNavItems} activeItem="history" />
+      <BottomNavBar
+        items={bottomNavItems}
+        activeItem="history"
+        onItemPress={(item) => {
+          if (item.key === 'home') navigation?.navigate('StudentDashboard');
+          else if (item.key === 'attendance') navigation?.navigate('StudentAttendanceDetail');
+          else if (item.key === 'history') navigation?.navigate('AttendanceHistory');
+          else if (item.key === 'profile') navigation?.navigate('StudentProfile');
+        }}
+      />
     </SafeAreaView>
   );
 };

@@ -24,14 +24,21 @@ const StudentDashboard = ({ navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       <TopAppBar
         title="Student Portal"
+        showBack
+        onBackPress={() => navigation?.navigate('Login')}
         profileImage="https://lh3.googleusercontent.com/aida-public/AB6AXuDh3ENYoGBBV3bwzJspo81SvX0BWvEf23eyCzngqYJi8Cvhm9IqFDfJMK-_BL37P9EyvAzSBkAdyPSWaHNJHS1p9giuzDzevIiw7Y9b9FeWUmRDkYC0NUqGXjYAbk1fuW-CxWJmGUh15EtLUrm0dk4EwB_vFa1gpTrE-hdF6YhiHf8joIq2cbe9phvQOw1N-_TkQwnHGty6vZEaX2XtroEdA2Mg-yxJSUcQivTuQht1R0DFo2GOPE7e"
+        onProfilePress={() => navigation?.navigate('StudentProfile')}
       />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.contentInner}>
           {/* Overall Attendance Card */}
-          <View style={styles.overallCard}>
+          <TouchableOpacity
+            style={styles.overallCard}
+            activeOpacity={0.85}
+            onPress={() => navigation?.navigate('StudentAttendanceDetail')}
+          >
             <Text style={styles.overallLabel}>Overall Attendance</Text>
-            {/* Circular Progress (simplified) */}
+            {/* Circular Progress */}
             <View style={styles.circularContainer}>
               <View style={styles.circularOuter}>
                 <View style={styles.circularInner}>
@@ -41,14 +48,18 @@ const StudentDashboard = ({ navigation }) => {
             </View>
             <View style={styles.statusBadge}>
               <MaterialIcons name="check-circle" size={16} color="#166534" />
-              <Text style={styles.statusText}>Good Standing</Text>
+              <Text style={styles.statusText}>Good Standing • Tap for details</Text>
             </View>
-          </View>
+          </TouchableOpacity>
 
           {/* Breakdown Cards */}
           <View style={styles.breakdownRow}>
             {/* Present */}
-            <View style={styles.breakdownCard}>
+            <TouchableOpacity
+              style={styles.breakdownCard}
+              activeOpacity={0.8}
+              onPress={() => navigation?.navigate('StudentAttendanceDetail')}
+            >
               <View style={styles.breakdownHeader}>
                 <Text style={styles.breakdownLabel}>Total Present</Text>
                 <View style={[styles.breakdownIcon, { backgroundColor: '#dbeafe' }]}>
@@ -59,10 +70,14 @@ const StudentDashboard = ({ navigation }) => {
                 <Text style={styles.breakdownNumber}>220</Text>
                 <Text style={styles.breakdownUnit}>sessions</Text>
               </View>
-            </View>
+            </TouchableOpacity>
 
             {/* Absent */}
-            <View style={styles.breakdownCard}>
+            <TouchableOpacity
+              style={styles.breakdownCard}
+              activeOpacity={0.8}
+              onPress={() => navigation?.navigate('StudentAttendanceDetail')}
+            >
               <View style={styles.breakdownHeader}>
                 <Text style={styles.breakdownLabel}>Total Absent</Text>
                 <View style={[styles.breakdownIcon, { backgroundColor: '#fee2e2' }]}>
@@ -73,10 +88,14 @@ const StudentDashboard = ({ navigation }) => {
                 <Text style={styles.breakdownNumber}>25</Text>
                 <Text style={styles.breakdownUnit}>sessions</Text>
               </View>
-            </View>
+            </TouchableOpacity>
 
             {/* On Duty */}
-            <View style={styles.breakdownCard}>
+            <TouchableOpacity
+              style={styles.breakdownCard}
+              activeOpacity={0.8}
+              onPress={() => navigation?.navigate('StudentAttendanceDetail')}
+            >
               <View style={styles.breakdownHeader}>
                 <Text style={styles.breakdownLabel}>On Duty (OD)</Text>
                 <View style={[styles.breakdownIcon, { backgroundColor: '#ffedd5' }]}>
@@ -87,19 +106,24 @@ const StudentDashboard = ({ navigation }) => {
                 <Text style={styles.breakdownNumber}>5</Text>
                 <Text style={styles.breakdownUnit}>sessions</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
 
           {/* Subject Breakdown */}
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Subject Breakdown</Text>
-            <TouchableOpacity>
-              <Text style={styles.viewAllLink}>View All</Text>
+            <TouchableOpacity onPress={() => navigation?.navigate('StudentAttendanceDetail')}>
+              <Text style={styles.viewAllLink}>View All →</Text>
             </TouchableOpacity>
           </View>
 
           {subjects.map((subject, index) => (
-            <View key={index} style={[styles.subjectCard, subject.warning && styles.subjectCardWarning]}>
+            <TouchableOpacity
+              key={index}
+              style={[styles.subjectCard, subject.warning && styles.subjectCardWarning]}
+              activeOpacity={0.85}
+              onPress={() => navigation?.navigate('StudentAttendanceDetail')}
+            >
               {subject.warning && (
                 <View style={styles.warningBadge}>
                   <Text style={styles.warningBadgeText}>WARNING</Text>
@@ -118,7 +142,7 @@ const StudentDashboard = ({ navigation }) => {
               <View style={styles.progressBarBg}>
                 <View style={[styles.progressBarFill, { width: `${subject.percentage}%`, backgroundColor: subject.color }]} />
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
@@ -127,9 +151,10 @@ const StudentDashboard = ({ navigation }) => {
         items={bottomNavItems}
         activeItem="home"
         onItemPress={(item) => {
-          if (item.key === 'profile') navigation?.navigate('StudentProfile');
-          else if (item.key === 'history') navigation?.navigate('AttendanceHistory');
+          if (item.key === 'home') navigation?.navigate('StudentDashboard');
           else if (item.key === 'attendance') navigation?.navigate('StudentAttendanceDetail');
+          else if (item.key === 'history') navigation?.navigate('AttendanceHistory');
+          else if (item.key === 'profile') navigation?.navigate('StudentProfile');
         }}
       />
     </SafeAreaView>

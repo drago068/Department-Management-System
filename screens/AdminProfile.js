@@ -57,7 +57,18 @@ export default function AdminProfile({ navigation }) {
           <View style={styles.headerInner}>
 
             {/* NEXUS Logo */}
-            <View style={styles.logoSection}>
+            <View style={[styles.logoSection, { flexDirection: 'row', alignItems: 'center' }]}>
+
+              <TouchableOpacity
+                style={{ marginRight: 8, padding: 4 }}
+                onPress={() => {
+                  if (navigation && navigation.canGoBack()) navigation.goBack();
+                  else navigation?.navigate('AdminDashboard');
+                }}
+                activeOpacity={0.7}
+              >
+                <MaterialIcons name="arrow-back" size={24} color="#1a56db" />
+              </TouchableOpacity>
 
               <Image
                 source={{ uri: NEXUS_LOGO }}
@@ -75,21 +86,20 @@ export default function AdminProfile({ navigation }) {
             </View>
 
 
-            {/* Notification */}
+            {/* Logout / Notification */}
             <View style={styles.headerRight}>
 
               <TouchableOpacity
                 style={styles.notificationButton}
                 activeOpacity={0.7}
+                onPress={() => navigation?.navigate('Login')}
               >
 
                 <MaterialIcons
-                  name="notifications"
-                  size={24}
-                  color="#434654"
+                  name="logout"
+                  size={22}
+                  color="#dc2626"
                 />
-
-                <View style={styles.notificationDot} />
 
               </TouchableOpacity>
 
@@ -510,42 +520,62 @@ export default function AdminProfile({ navigation }) {
               activeOpacity={0.7}
               onPress={() => navigation?.navigate('AdminDashboard')}
             >
-
               <MaterialIcons
                 name="dashboard"
                 size={24}
                 color="#434654"
               />
-
               <Text style={styles.navText}>
                 Home
               </Text>
-
             </TouchableOpacity>
 
+            {/* Reports */}
+            <TouchableOpacity
+              style={styles.navItem}
+              activeOpacity={0.7}
+              onPress={() => navigation?.navigate('ReportManagement')}
+            >
+              <MaterialIcons
+                name="summarize"
+                size={24}
+                color="#434654"
+              />
+              <Text style={styles.navText}>
+                Reports
+              </Text>
+            </TouchableOpacity>
 
-            {/* Empty Reports Slot */}
-            <View style={styles.navItem}>
-            </View>
-
+            {/* History */}
+            <TouchableOpacity
+              style={styles.navItem}
+              activeOpacity={0.7}
+              onPress={() => navigation?.navigate('AttendanceHistory')}
+            >
+              <MaterialIcons
+                name="calendar-month"
+                size={24}
+                color="#434654"
+              />
+              <Text style={styles.navText}>
+                History
+              </Text>
+            </TouchableOpacity>
 
             {/* Profile Active */}
             <TouchableOpacity
               style={styles.navItem}
               activeOpacity={0.7}
-              onPress={() => navigation?.navigate('AdminProfile')}
+              onPress={() => {}}
             >
-
               <MaterialIcons
                 name="person"
                 size={24}
                 color="#1a56db"
               />
-
               <Text style={styles.activeNavText}>
                 Profile
               </Text>
-
             </TouchableOpacity>
 
           </View>

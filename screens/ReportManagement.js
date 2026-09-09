@@ -39,7 +39,15 @@ const ReportManagement = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <TopAppBar title="Reports" />
+      <TopAppBar
+        title="Reports"
+        showBack
+        onBackPress={() => {
+          if (navigation && navigation.canGoBack()) navigation.goBack();
+          else navigation?.navigate('AdminDashboard');
+        }}
+        onProfilePress={() => navigation?.navigate('AdminProfile')}
+      />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.contentInner}>
           {/* Page Header */}
@@ -137,7 +145,16 @@ const ReportManagement = ({ navigation }) => {
           </View>
         </View>
       </ScrollView>
-      <BottomNavBar items={bottomNavItems} activeItem="home" />
+      <BottomNavBar
+        items={bottomNavItems}
+        activeItem="attendance"
+        onItemPress={(item) => {
+          if (item.key === 'home') navigation?.navigate('AdminDashboard');
+          else if (item.key === 'attendance' || item.key === 'reports') navigation?.navigate('ReportManagement');
+          else if (item.key === 'history') navigation?.navigate('AttendanceHistory');
+          else if (item.key === 'profile') navigation?.navigate('AdminProfile');
+        }}
+      />
     </SafeAreaView>
   );
 };

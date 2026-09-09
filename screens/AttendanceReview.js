@@ -41,7 +41,14 @@ const AttendanceReview = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <TopAppBar title="Attendance Review" />
+      <TopAppBar
+        title="Attendance Review"
+        showBack
+        onBackPress={() => {
+          if (navigation && navigation.canGoBack()) navigation.goBack();
+          else navigation?.navigate('StaffDashboard');
+        }}
+      />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.contentInner}>
           {/* Page Header */}
@@ -117,7 +124,16 @@ const AttendanceReview = ({ navigation }) => {
           })}
         </View>
       </ScrollView>
-      <BottomNavBar items={bottomNavItems} activeItem="attendance" />
+      <BottomNavBar
+        items={bottomNavItems}
+        activeItem="attendance"
+        onItemPress={(item) => {
+          if (item.key === 'home') navigation?.navigate('StaffDashboard');
+          else if (item.key === 'attendance') navigation?.navigate('MarkAttendance');
+          else if (item.key === 'history') navigation?.navigate('AttendanceHistory');
+          else if (item.key === 'profile') navigation?.navigate('StaffProfile');
+        }}
+      />
     </SafeAreaView>
   );
 };

@@ -104,7 +104,18 @@ export default function StaffProfile({ navigation }) {
 
         {/* ================= HEADER ================= */}
         <View style={styles.header}>
-          <View style={styles.headerLeft}>
+          <View style={[styles.headerLeft, { flexDirection: 'row', alignItems: 'center' }]}>
+            <TouchableOpacity
+              style={{ marginRight: 8, padding: 4 }}
+              onPress={() => {
+                if (navigation && navigation.canGoBack()) navigation.goBack();
+                else navigation?.navigate('StaffDashboard');
+              }}
+              activeOpacity={0.7}
+            >
+              <MaterialIcons name="arrow-back" size={24} color="#003fb1" />
+            </TouchableOpacity>
+
             <Text style={styles.nexusText}>
               NEXUS College
             </Text>
@@ -114,15 +125,13 @@ export default function StaffProfile({ navigation }) {
             <TouchableOpacity
               style={styles.notificationButton}
               activeOpacity={0.7}
-              onPress={() => triggerToast('No new notifications')}
+              onPress={() => navigation?.navigate('Login')}
             >
               <MaterialIcons
-                name="notifications-none"
-                size={25}
-                color="#003fb1"
+                name="logout"
+                size={22}
+                color="#dc2626"
               />
-
-              <View style={styles.notificationDot} />
             </TouchableOpacity>
 
             <View style={styles.headerProfileRing}>
@@ -433,8 +442,8 @@ export default function StaffProfile({ navigation }) {
             >
               <MaterialIcons
                 name="dashboard"
-                size={25}
-                color="#003fb1"
+                size={24}
+                color="#585f6c"
               />
 
               <Text style={styles.navText}>
@@ -442,10 +451,39 @@ export default function StaffProfile({ navigation }) {
               </Text>
             </TouchableOpacity>
 
-            {/* Empty History Slot */}
-            <View style={styles.navItem}>
-              {/* Original HTML contains an empty navigation slot */}
-            </View>
+            {/* Attendance */}
+            <TouchableOpacity
+              style={styles.navItem}
+              activeOpacity={0.7}
+              onPress={() => navigation?.navigate('MarkAttendance')}
+            >
+              <MaterialIcons
+                name="how-to-reg"
+                size={24}
+                color="#585f6c"
+              />
+
+              <Text style={styles.navText}>
+                Attendance
+              </Text>
+            </TouchableOpacity>
+
+            {/* History */}
+            <TouchableOpacity
+              style={styles.navItem}
+              activeOpacity={0.7}
+              onPress={() => navigation?.navigate('AttendanceHistory')}
+            >
+              <MaterialIcons
+                name="calendar-month"
+                size={24}
+                color="#585f6c"
+              />
+
+              <Text style={styles.navText}>
+                History
+              </Text>
+            </TouchableOpacity>
 
             {/* Profile */}
             <TouchableOpacity
@@ -454,8 +492,8 @@ export default function StaffProfile({ navigation }) {
               onPress={() => {}}
             >
               <MaterialIcons
-                name="account-circle"
-                size={26}
+                name="person"
+                size={24}
                 color="#003fb1"
               />
 

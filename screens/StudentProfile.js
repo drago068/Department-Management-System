@@ -78,6 +78,20 @@ const StudentProfile = ({ navigation }) => {
         {/* ================= TOP BAR ================= */}
         <View style={styles.header}>
           <View style={styles.brandContainer}>
+            <TouchableOpacity
+              style={{ marginRight: 8, padding: 4 }}
+              onPress={() => {
+                if (navigation && navigation.canGoBack()) {
+                  navigation.goBack();
+                } else {
+                  navigation?.navigate('StudentDashboard');
+                }
+              }}
+              activeOpacity={0.7}
+            >
+              <MaterialIcons name="arrow-back" size={24} color="#1e293b" />
+            </TouchableOpacity>
+
             <View style={styles.logoWrapper}>
               <Image
                 source={{ uri: COLLEGE_LOGO }}
@@ -92,14 +106,13 @@ const StudentProfile = ({ navigation }) => {
           <TouchableOpacity
             activeOpacity={0.7}
             style={styles.notificationButton}
+            onPress={() => navigation?.navigate('Login')}
           >
             <MaterialIcons
-              name="notifications"
-              size={26}
-              color="#334155"
+              name="logout"
+              size={22}
+              color="#dc2626"
             />
-
-            <View style={styles.notificationDot} />
           </TouchableOpacity>
         </View>
 
@@ -237,14 +250,25 @@ const StudentProfile = ({ navigation }) => {
         <View style={styles.bottomNavigation}>
 
           <BottomNavItem
-            icon="grid-view"
+            icon="dashboard"
             label="Home"
             active={false}
             onPress={() => navigation?.navigate('StudentDashboard')}
           />
 
-          {/* Empty history item preserved from original */}
-          <View style={styles.emptyNavItem} />
+          <BottomNavItem
+            icon="how-to-reg"
+            label="Attendance"
+            active={false}
+            onPress={() => navigation?.navigate('StudentAttendanceDetail')}
+          />
+
+          <BottomNavItem
+            icon="calendar-month"
+            label="History"
+            active={false}
+            onPress={() => navigation?.navigate('AttendanceHistory')}
+          />
 
           <BottomNavItem
             icon="person"

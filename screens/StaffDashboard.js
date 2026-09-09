@@ -36,8 +36,10 @@ const StaffDashboard = ({ navigation }) => {
     <SafeAreaView style={styles.safeArea}>
       <TopAppBar
         title="Staff Dashboard"
+        showBack
+        onBackPress={() => navigation?.navigate('Login')}
         profileImage="https://lh3.googleusercontent.com/aida-public/AB6AXuBs_nuDOZI8b0LXnGPwlVMAVvPv3x7Wwy3GRF14ZCT3QycxHWwSYQml_IqpVh65vsu37hppsz3ERw9tfu6VbVPZebxushWkfgRx4hqCIRt3gulDmO8Ijm8_vybY_AtMzAcA7FHaH964F7nb7xXOOtvkylYcLFkKCKvc5tKwELHDOO-a8DxwkjkdN0KiI8Irb5sH52aXRTSKJDO0qB1QGvUKxwxxNhftj8DZ8aKoy1LhOopLEGncHwIM"
-        showMenu
+        onProfilePress={() => navigation?.navigate('StaffProfile')}
       />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.contentInner}>
@@ -135,9 +137,10 @@ const StaffDashboard = ({ navigation }) => {
         items={bottomNavItems}
         activeItem="home"
         onItemPress={(item) => {
-          if (item.key === 'profile') navigation?.navigate('StaffProfile');
+          if (item.key === 'home') navigation?.navigate('StaffDashboard');
           else if (item.key === 'attendance') navigation?.navigate('MarkAttendance');
           else if (item.key === 'history') navigation?.navigate('AttendanceHistory');
+          else if (item.key === 'profile') navigation?.navigate('StaffProfile');
         }}
       />
     </SafeAreaView>

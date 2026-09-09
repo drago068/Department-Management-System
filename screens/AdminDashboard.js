@@ -51,8 +51,11 @@ const AdminDashboard = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <TopAppBar
-        title="NEXUS"
+        title="Admin Portal"
+        showBack
+        onBackPress={() => navigation?.navigate('Login')}
         profileImage="https://lh3.googleusercontent.com/aida-public/AB6AXuD1t5z-_oQFWEaabU_WJXKo_VqO91Cj1cerTlzKrkGfjfKSqcYLxb4osCTXeFfFjZjt_RwN3XSs7E1IjqHQ43_S6DeISPQpGZI_lcQ6DCjefn5fA5c6dauILyxqbS3i7H0BtINyQEDLxsbF_xi4onTPB9L_t93ppw-qwRTYb9mtB6ZZQgC6rfLajdkVnLkA96olIVw7dGBlx7YQ2Lb8Yr0yoJg7mPl5YPriyQ0Eed4zO8R7r8JS1wHO"
+        onProfilePress={() => navigation?.navigate('AdminProfile')}
       />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.contentInner}>
@@ -144,7 +147,15 @@ const AdminDashboard = ({ navigation }) => {
             <Text style={styles.sectionTitle}>Quick Actions</Text>
             <View style={styles.quickActionsGrid}>
               {quickActions.map((action, index) => (
-                <TouchableOpacity key={index} style={styles.quickActionItem} activeOpacity={0.7}>
+                <TouchableOpacity
+                  key={index}
+                  style={styles.quickActionItem}
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    if (action.label === 'Generate Reports') navigation?.navigate('ReportManagement');
+                    else if (action.label === 'Assign Subjects' || action.label === 'Add Student') navigation?.navigate('ReportManagement');
+                  }}
+                >
                   <MaterialIcons name={action.icon} size={24} color={action.color} />
                   <Text style={styles.quickActionText}>{action.label}</Text>
                 </TouchableOpacity>
@@ -170,8 +181,10 @@ const AdminDashboard = ({ navigation }) => {
         items={bottomNavItems}
         activeItem="home"
         onItemPress={(item) => {
-          if (item.key === 'profile') navigation?.navigate('AdminProfile');
-          else if (item.key === 'reports') navigation?.navigate('ReportManagement');
+          if (item.key === 'home') navigation?.navigate('AdminDashboard');
+          else if (item.key === 'attendance' || item.key === 'reports') navigation?.navigate('ReportManagement');
+          else if (item.key === 'history') navigation?.navigate('AttendanceHistory');
+          else if (item.key === 'profile') navigation?.navigate('AdminProfile');
         }}
       />
     </SafeAreaView>

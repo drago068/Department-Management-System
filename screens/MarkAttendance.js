@@ -54,7 +54,15 @@ const MarkAttendance = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <TopAppBar title="Mark Attendance" showMenu onMenuPress={() => navigation.goBack()} />
+      <TopAppBar
+        title="Mark Attendance"
+        showBack
+        onBackPress={() => {
+          if (navigation && navigation.canGoBack()) navigation.goBack();
+          else navigation?.navigate('StaffDashboard');
+        }}
+        onProfilePress={() => navigation?.navigate('StaffProfile')}
+      />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.contentInner}>
           {/* Class Info Header */}
@@ -144,13 +152,26 @@ const MarkAttendance = ({ navigation }) => {
           </View>
 
           {/* Submit Button */}
-          <TouchableOpacity style={styles.submitButton} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.submitButton}
+            activeOpacity={0.8}
+            onPress={() => navigation?.navigate('AttendanceReview')}
+          >
             <MaterialIcons name="check-circle" size={20} color={Colors.onPrimary} />
-            <Text style={styles.submitButtonText}>Submit Attendance</Text>
+            <Text style={styles.submitButtonText}>Review & Submit Attendance</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <BottomNavBar items={bottomNavItems} activeItem="attendance" />
+      <BottomNavBar
+        items={bottomNavItems}
+        activeItem="attendance"
+        onItemPress={(item) => {
+          if (item.key === 'home') navigation?.navigate('StaffDashboard');
+          else if (item.key === 'attendance') navigation?.navigate('MarkAttendance');
+          else if (item.key === 'history') navigation?.navigate('AttendanceHistory');
+          else if (item.key === 'profile') navigation?.navigate('StaffProfile');
+        }}
+      />
     </SafeAreaView>
   );
 };
