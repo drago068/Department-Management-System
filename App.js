@@ -23,6 +23,7 @@ import StudentEditProfile from './screens/StudentEditProfile';
 import StudentAttendanceDetail from './screens/StudentAttendanceDetail';
 import ReportManagement from './screens/ReportManagement';
 import StudyMaterials from './screens/StudyMaterials';
+import StaffNotes from './screens/StaffNotes';
 
 const Stack = createNativeStackNavigator();
 
@@ -61,6 +62,7 @@ export default function App() {
           <Stack.Screen name="AdminEditProfile" component={AdminEditProfile} />
           <Stack.Screen name="StaffProfile" component={StaffProfile} />
           <Stack.Screen name="StaffEditProfile" component={StaffEditProfile} />
+          <Stack.Screen name="StaffNotes" component={StaffNotes} />
           <Stack.Screen name="StudentProfile" component={StudentProfile} />
           <Stack.Screen name="StudentEditProfile" component={StudentEditProfile} />
           <Stack.Screen name="StudentAttendanceDetail" component={StudentAttendanceDetail} />

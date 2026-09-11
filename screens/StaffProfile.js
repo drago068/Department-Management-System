@@ -427,12 +427,9 @@ export default function StaffProfile({ navigation }) {
         </View>
 
         {/* ================= BOTTOM NAVIGATION ================= */}
+        {/* ================= BOTTOM NAVIGATION ================= */}
         <View style={styles.bottomNavWrapper}>
-          <BlurView
-            intensity={80}
-            tint="light"
-            style={styles.bottomNav}
-          >
+          <View style={styles.bottomNav}>
 
             {/* Home */}
             <TouchableOpacity
@@ -468,20 +465,20 @@ export default function StaffProfile({ navigation }) {
               </Text>
             </TouchableOpacity>
 
-            {/* History */}
+            {/* Notes & QP */}
             <TouchableOpacity
               style={styles.navItem}
               activeOpacity={0.7}
-              onPress={() => navigation?.navigate('AttendanceHistory')}
+              onPress={() => navigation?.navigate('StaffNotes')}
             >
               <MaterialIcons
-                name="calendar-month"
+                name="menu-book"
                 size={24}
                 color="#585f6c"
               />
 
               <Text style={styles.navText}>
-                History
+                Notes & QP
               </Text>
             </TouchableOpacity>
 
@@ -502,7 +499,7 @@ export default function StaffProfile({ navigation }) {
               </Text>
             </TouchableOpacity>
 
-          </BlurView>
+          </View>
         </View>
 
       </View>
@@ -522,8 +519,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
-    maxWidth: 390,
-    alignSelf: 'center',
     backgroundColor: '#faf8ff',
   },
 
@@ -611,6 +606,9 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingHorizontal: 16,
     paddingBottom: 20,
+    width: '100%',
+    maxWidth: 440,
+    alignSelf: 'center',
   },
 
   /* ================= TOAST ================= */
@@ -874,16 +872,19 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: 70,
-
+    height: 64,
+    backgroundColor: '#ffffff',
+    borderTopWidth: 1,
+    borderTopColor: '#e2e8f0',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: -2,
     },
     shadowOpacity: 0.08,
-    shadowRadius: 8,
+    shadowRadius: 6,
     elevation: 10,
+    zIndex: 100,
   },
 
   bottomNav: {
@@ -891,30 +892,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    overflow: 'hidden',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.06)',
+    paddingHorizontal: 8,
   },
 
   navItem: {
-    flex: 1,
-    height: 65,
+    minWidth: 64,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 2,
   },
 
   navText: {
-    fontSize: 12,
-    lineHeight: 16,
+    marginTop: 2,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '500',
-    color: '#555555',
+    color: '#585f6c',
   },
 
   navTextActive: {
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '600',
+    marginTop: 2,
+    fontSize: 10,
+    lineHeight: 14,
+    fontWeight: '700',
     color: '#003fb1',
   },
 });

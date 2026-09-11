@@ -807,8 +807,8 @@ export default function StudentDashboard({ navigation }) {
                 <Text style={styles.creditsText}>• Esakki Muthu M (AI & DS)</Text>
                 <Text style={styles.creditsText}>• Abishek R K (AI & DS)</Text>
                 <Text style={[styles.creditsHeading, { marginTop: 8 }]}>Faculty Mentors</Text>
-                <Text style={styles.creditsText}>• Mr. Vasanth V, HOD AI & DS</Text>
-                <Text style={styles.creditsText}>• Dr. Arulprakash P, Associate Professor</Text>
+                <Text style={styles.creditsText}>• Dr. Arulprakash P, HOD AI & DS</Text>
+                <Text style={styles.creditsText}>• Mr. Vasanth V, Assistant Professor</Text>
               </View>
             </ScrollView>
           </View>

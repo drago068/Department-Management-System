@@ -48,7 +48,7 @@ const MarkAttendance = ({ navigation }) => {
   const bottomNavItems = [
     { key: 'home', label: 'Home', icon: 'dashboard' },
     { key: 'attendance', label: 'Attendance', icon: 'how-to-reg' },
-    { key: 'history', label: 'History', icon: 'calendar-month' },
+    { key: 'notes', label: 'Notes & QP', icon: 'menu-book' },
     { key: 'profile', label: 'Profile', icon: 'person' },
   ];
 
@@ -168,7 +168,7 @@ const MarkAttendance = ({ navigation }) => {
         onItemPress={(item) => {
           if (item.key === 'home') navigation?.navigate('StaffDashboard');
           else if (item.key === 'attendance') navigation?.navigate('MarkAttendance');
-          else if (item.key === 'history') navigation?.navigate('AttendanceHistory');
+          else if (item.key === 'notes') navigation?.navigate('StaffNotes');
           else if (item.key === 'profile') navigation?.navigate('StaffProfile');
         }}
       />
