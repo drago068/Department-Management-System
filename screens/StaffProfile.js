@@ -15,6 +15,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { MaterialIcons } from '@expo/vector-icons';
+import BottomNavBar from '../components/BottomNavBar';
 
 const { width } = Dimensions.get('window');
 
@@ -427,81 +428,7 @@ export default function StaffProfile({ navigation }) {
         </View>
 
         {/* ================= BOTTOM NAVIGATION ================= */}
-        {/* ================= BOTTOM NAVIGATION ================= */}
-        <View style={styles.bottomNavWrapper}>
-          <View style={styles.bottomNav}>
-
-            {/* Home */}
-            <TouchableOpacity
-              style={styles.navItem}
-              activeOpacity={0.7}
-              onPress={() => navigation?.navigate('StaffDashboard')}
-            >
-              <MaterialIcons
-                name="dashboard"
-                size={24}
-                color="#585f6c"
-              />
-
-              <Text style={styles.navText}>
-                Home
-              </Text>
-            </TouchableOpacity>
-
-            {/* Attendance */}
-            <TouchableOpacity
-              style={styles.navItem}
-              activeOpacity={0.7}
-              onPress={() => navigation?.navigate('MarkAttendance')}
-            >
-              <MaterialIcons
-                name="how-to-reg"
-                size={24}
-                color="#585f6c"
-              />
-
-              <Text style={styles.navText}>
-                Attendance
-              </Text>
-            </TouchableOpacity>
-
-            {/* Notes & QP */}
-            <TouchableOpacity
-              style={styles.navItem}
-              activeOpacity={0.7}
-              onPress={() => navigation?.navigate('StaffNotes')}
-            >
-              <MaterialIcons
-                name="menu-book"
-                size={24}
-                color="#585f6c"
-              />
-
-              <Text style={styles.navText}>
-                Notes & QP
-              </Text>
-            </TouchableOpacity>
-
-            {/* Profile */}
-            <TouchableOpacity
-              style={styles.navItem}
-              activeOpacity={0.7}
-              onPress={() => {}}
-            >
-              <MaterialIcons
-                name="person"
-                size={24}
-                color="#003fb1"
-              />
-
-              <Text style={styles.navTextActive}>
-                Profile
-              </Text>
-            </TouchableOpacity>
-
-          </View>
-        </View>
-
+        <BottomNavBar activeItem="profile" navigation={navigation} />
       </View>
     </SafeAreaView>
   );

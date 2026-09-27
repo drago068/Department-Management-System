@@ -134,14 +134,8 @@ const StaffDashboard = ({ navigation }) => {
       </ScrollView>
 
       <BottomNavBar
-        items={bottomNavItems}
         activeItem="home"
-        onItemPress={(item) => {
-          if (item.key === 'home') navigation?.navigate('StaffDashboard');
-          else if (item.key === 'attendance') navigation?.navigate('MarkAttendance');
-          else if (item.key === 'notes') navigation?.navigate('StaffNotes');
-          else if (item.key === 'profile') navigation?.navigate('StaffProfile');
-        }}
+        navigation={navigation}
       />
     </SafeAreaView>
   );

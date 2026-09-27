@@ -40,32 +40,6 @@ const DetailRow = ({ icon, label, value }) => {
   );
 };
 
-const BottomNavItem = ({ icon, label, active, onPress }) => {
-  if (active) {
-    return (
-      <TouchableOpacity
-        activeOpacity={0.9}
-        onPress={onPress}
-        style={styles.activeNavItem}
-      >
-        <MaterialIcons name={icon} size={20} color="#ffffff" />
-        <Text style={styles.activeNavText}>{label}</Text>
-      </TouchableOpacity>
-    );
-  }
-
-  return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={onPress}
-      style={styles.navItem}
-    >
-      <MaterialIcons name={icon} size={22} color="#64748b" />
-      <Text style={styles.navText}>{label}</Text>
-    </TouchableOpacity>
-  );
-};
-
 const StudentProfile = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -75,7 +49,6 @@ const StudentProfile = ({ navigation }) => {
       />
 
       <View style={styles.appContainer}>
-
         {/* ================= TOP BAR ================= */}
         <View style={styles.header}>
           <View style={styles.brandContainer}>
@@ -120,6 +93,7 @@ const StudentProfile = ({ navigation }) => {
         {/* ================= MAIN CONTENT ================= */}
         <ScrollView
           showsVerticalScrollIndicator={false}
+          style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
         >
           {/* Section Title */}
@@ -145,7 +119,6 @@ const StudentProfile = ({ navigation }) => {
 
           {/* ================= STUDENT CARD ================= */}
           <View style={styles.studentCard}>
-
             {/* Blue Cover */}
             <LinearGradient
               colors={['#1a56db', '#3b82f6']}
@@ -170,16 +143,10 @@ const StudentProfile = ({ navigation }) => {
               </View>
             </LinearGradient>
 
-            {/* Student Information */}
+            {/* Student Info */}
             <View style={styles.studentInfo}>
-
-              <Text style={styles.studentName}>
-                Aravind Kumar
-              </Text>
-
-              <Text style={styles.registerNumber}>
-                21AD042
-              </Text>
+              <Text style={styles.studentName}>Aravind Kumar</Text>
+              <Text style={styles.registerNumber}>21AD042</Text>
 
               <View style={styles.departmentPill}>
                 <Text style={styles.departmentText}>
@@ -195,7 +162,6 @@ const StudentProfile = ({ navigation }) => {
 
               {/* Details */}
               <View style={styles.detailsContainer}>
-
                 <DetailRow
                   icon="mail"
                   label="Email"
@@ -219,32 +185,12 @@ const StudentProfile = ({ navigation }) => {
                   label="DOB / Blood Group"
                   value="14 Aug 2003 • O+ve"
                 />
-
               </View>
             </View>
           </View>
 
-          {/* ================= PERFORMANCE ================= */}
-          <View style={styles.performanceSection}>
-            {/* Kept empty because the original HTML section
-                contains an empty metrics grid. */}
-          </View>
-
-          {/* ================= COURSE ATTENDANCE ================= */}
-          <View style={styles.courseSection}>
-            {/* Kept empty because the original HTML
-                contains no visible course content. */}
-          </View>
-
-          {/* ================= QUICK ACTIONS ================= */}
-          <View style={styles.servicesSection}>
-            {/* The original HTML contains empty quick-action
-                placeholders, therefore no visible elements
-                are added here. */}
-          </View>
-
-          {/* Extra bottom spacing */}
-          <View style={{ height: 90 }} />
+          {/* Extra bottom spacing to avoid bottom nav overlay */}
+          <View style={{ height: 80 }} />
         </ScrollView>
 
         <StudentBottomNav activeTab="profile" navigation={navigation} />
@@ -254,39 +200,26 @@ const StudentProfile = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  /* ================= ROOT ================= */
-
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8f9fe',
+    backgroundColor: '#fafbff',
   },
 
   appContainer: {
     flex: 1,
     width: '100%',
-    maxWidth: 420,
-    alignSelf: 'center',
     backgroundColor: '#fafbff',
-    position: 'relative',
   },
 
-  /* ================= HEADER ================= */
-
   header: {
-    height: 68,
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 12,
-
+    height: 64,
+    paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-
     backgroundColor: '#fafbff',
-
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
-
     zIndex: 30,
   },
 
@@ -296,31 +229,16 @@ const styles = StyleSheet.create({
   },
 
   logoWrapper: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#ffffff',
-
     padding: 2,
-
     borderWidth: 2,
     borderColor: 'rgba(37, 99, 235, 0.20)',
-
     alignItems: 'center',
     justifyContent: 'center',
-
     overflow: 'hidden',
-
-    shadowColor: '#000000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-
-    elevation: 2,
   },
 
   logo: {
@@ -329,86 +247,57 @@ const styles = StyleSheet.create({
   },
 
   nexusText: {
-    marginLeft: 12,
-
-    fontSize: 24,
+    marginLeft: 10,
+    fontSize: 20,
     fontWeight: '800',
-
     letterSpacing: -0.5,
-
     color: '#2563eb',
   },
 
   notificationButton: {
-    width: 42,
-    height: 42,
-
-    borderRadius: 21,
-
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-
-    position: 'relative',
   },
 
-  notificationDot: {
-    position: 'absolute',
-
-    top: 9,
-    right: 8,
-
-    width: 10,
-    height: 10,
-
-    borderRadius: 5,
-
-    backgroundColor: '#f43f5e',
-
-    borderWidth: 2,
-    borderColor: '#ffffff',
+  scrollView: {
+    flex: 1,
   },
-
-  /* ================= SCROLL ================= */
 
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 20,
+    width: '100%',
+    maxWidth: 480,
+    alignSelf: 'center',
   },
-
-  /* ================= TITLE ================= */
 
   titleSection: {
     marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 
   pageTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700',
-
     color: '#0f172a',
-
     letterSpacing: -0.5,
-
-    marginBottom: 12,
   },
 
   editButton: {
-    alignSelf: 'flex-start',
-
     flexDirection: 'row',
     alignItems: 'center',
-
     backgroundColor: '#ffffff',
-
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-
-    borderRadius: 12,
-
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: '#e2e8f0',
-
     shadowColor: '#000000',
     shadowOffset: {
       width: 0,
@@ -416,31 +305,22 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.04,
     shadowRadius: 2,
-
     elevation: 1,
   },
 
   editText: {
-    marginLeft: 8,
-
+    marginLeft: 6,
     fontSize: 12,
     fontWeight: '600',
-
     color: '#334155',
   },
 
-  /* ================= STUDENT CARD ================= */
-
   studentCard: {
     backgroundColor: '#ffffff',
-
-    borderRadius: 24,
-
+    borderRadius: 20,
     overflow: 'hidden',
-
     borderWidth: 1,
     borderColor: 'rgba(226, 232, 240, 0.8)',
-
     shadowColor: '#000000',
     shadowOffset: {
       width: 0,
@@ -448,41 +328,31 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.04,
     shadowRadius: 10,
-
     elevation: 2,
   },
 
   cover: {
     height: 96,
-
     position: 'relative',
-
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
 
   profileImageContainer: {
     position: 'absolute',
-
     bottom: -40,
-
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   profileImageBorder: {
-    width: 96,
-    height: 96,
-
-    borderRadius: 48,
-
-    padding: 4,
-
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    padding: 3,
     backgroundColor: '#ffffff',
-
-    borderWidth: 4,
+    borderWidth: 3,
     borderColor: '#ffffff',
-
     shadowColor: '#000000',
     shadowOffset: {
       width: 0,
@@ -490,35 +360,26 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.12,
     shadowRadius: 6,
-
     elevation: 4,
-
     overflow: 'hidden',
   },
 
   profileImage: {
     width: '100%',
     height: '100%',
-
-    borderRadius: 48,
+    borderRadius: 45,
   },
 
   activeIndicator: {
     position: 'absolute',
-
     right: 2,
     bottom: 3,
-
-    width: 20,
-    height: 20,
-
-    borderRadius: 10,
-
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: '#10b981',
-
     borderWidth: 2,
     borderColor: '#ffffff',
-
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -526,84 +387,61 @@ const styles = StyleSheet.create({
   activeIndicatorInner: {
     width: 6,
     height: 6,
-
     borderRadius: 3,
-
     backgroundColor: '#ffffff',
   },
 
-  /* ================= STUDENT INFO ================= */
-
   studentInfo: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingTop: 48,
-    paddingBottom: 24,
-
+    paddingBottom: 20,
     alignItems: 'center',
   },
 
   studentName: {
     fontSize: 20,
     fontWeight: '700',
-
     color: '#0f172a',
-
     lineHeight: 25,
-
     textAlign: 'center',
   },
 
   registerNumber: {
     marginTop: 2,
-
     fontSize: 14,
     fontWeight: '700',
-
     color: '#2563eb',
-
     letterSpacing: 0.7,
   },
 
   departmentPill: {
     marginTop: 10,
-
     paddingHorizontal: 14,
     paddingVertical: 4,
-
     borderRadius: 999,
-
     backgroundColor: '#e8ecf8',
   },
 
   departmentText: {
     fontSize: 12,
     fontWeight: '600',
-
     color: '#1a56db',
   },
 
   studentMeta: {
     marginTop: 8,
-
     fontSize: 11,
     fontWeight: '500',
-
     color: '#64748b',
-
     textAlign: 'center',
   },
 
   divider: {
     width: '100%',
-
     height: 1,
-
     backgroundColor: '#f1f5f9',
-
     marginVertical: 16,
   },
-
-  /* ================= DETAILS ================= */
 
   detailsContainer: {
     width: '100%',
@@ -611,157 +449,38 @@ const styles = StyleSheet.create({
 
   detailRow: {
     width: '100%',
-
-    minHeight: 34,
-
+    minHeight: 38,
     paddingHorizontal: 12,
-    paddingVertical: 6,
-
-    borderRadius: 12,
-
+    paddingVertical: 8,
+    borderRadius: 10,
     backgroundColor: '#f3f3fe',
-
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-
-    marginBottom: 10,
+    marginBottom: 8,
   },
 
   detailLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-
     flexShrink: 1,
   },
 
   detailLabel: {
     marginLeft: 10,
-
     fontSize: 12,
     fontWeight: '500',
-
     color: '#64748b',
   },
 
   detailValue: {
     marginLeft: 10,
-
     flexShrink: 1,
-
     maxWidth: 190,
-
     fontSize: 12,
     fontWeight: '600',
-
     color: '#1e293b',
-
     textAlign: 'right',
-  },
-
-  /* ================= EMPTY SECTIONS ================= */
-
-  performanceSection: {
-    marginTop: 14,
-  },
-
-  courseSection: {
-    marginTop: 4,
-  },
-
-  servicesSection: {
-    marginTop: 4,
-  },
-
-  /* ================= BOTTOM NAV ================= */
-
-  bottomNavigation: {
-    position: 'absolute',
-
-    left: 0,
-    right: 0,
-    bottom: 0,
-
-    height: 64,
-
-    backgroundColor: '#ffffff',
-
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(226, 232, 240, 0.8)',
-
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-
-    shadowColor: '#000000',
-    shadowOffset: {
-      width: 0,
-      height: -4,
-    },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-
-    elevation: 8,
-
-    zIndex: 40,
-  },
-
-  navItem: {
-    width: 60,
-    height: 48,
-
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    paddingVertical: 4,
-  },
-
-  navText: {
-    marginTop: 2,
-
-    fontSize: 10,
-    fontWeight: '500',
-
-    color: '#64748b',
-  },
-
-  emptyNavItem: {
-    width: 60,
-    height: 48,
-  },
-
-  activeNavItem: {
-    width: 64,
-    height: 48,
-
-    borderRadius: 24,
-
-    backgroundColor: '#1a56db',
-
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    shadowColor: '#1a56db',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.30,
-    shadowRadius: 6,
-
-    elevation: 5,
-  },
-
-  activeNavText: {
-    marginTop: -1,
-
-    fontSize: 10,
-    fontWeight: '600',
-
-    color: '#ffffff',
   },
 });
 

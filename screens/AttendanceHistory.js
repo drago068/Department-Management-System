@@ -28,10 +28,11 @@ const AttendanceHistory = ({ navigation }) => {
   ];
 
   const bottomNavItems = [
-    { key: 'home', label: 'Home', icon: 'dashboard' },
-    { key: 'attendance', label: 'Attendance', icon: 'how-to-reg' },
-    { key: 'history', label: 'History', icon: 'calendar-month' },
-    { key: 'profile', label: 'Profile', icon: 'person' },
+    { key: 'home', label: 'Home', icon: 'dashboard', screen: 'AdminDashboard' },
+    { key: 'attendance', label: 'Attendance', icon: 'how-to-reg', screen: 'ReportManagement' },
+    { key: 'timetable', label: 'Timetable', icon: 'calendar-month', screen: 'AdminTimetable' },
+    { key: 'history', label: 'History', icon: 'history', screen: 'AttendanceHistory' },
+    { key: 'profile', label: 'Profile', icon: 'person', screen: 'AdminProfile' },
   ];
 
   return (
@@ -121,12 +122,7 @@ const AttendanceHistory = ({ navigation }) => {
       <BottomNavBar
         items={bottomNavItems}
         activeItem="history"
-        onItemPress={(item) => {
-          if (item.key === 'home') navigation?.navigate('StudentDashboard');
-          else if (item.key === 'attendance') navigation?.navigate('StudentAttendanceDetail');
-          else if (item.key === 'history') navigation?.navigate('AttendanceHistory');
-          else if (item.key === 'profile') navigation?.navigate('StudentProfile');
-        }}
+        navigation={navigation}
       />
     </SafeAreaView>
   );

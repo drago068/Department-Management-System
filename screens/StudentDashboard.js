@@ -516,6 +516,8 @@ export default function StudentDashboard({ navigation }) {
   const handleServicePress = (key) => {
     if (key === "website") {
       openSCE();
+    } else if (key === "timetable") {
+      navigation?.navigate("StudentTimetable");
     } else {
       setActiveModal(key);
     }

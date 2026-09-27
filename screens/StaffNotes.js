@@ -12,6 +12,7 @@ import {
   Animated,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import BottomNavBar from "../components/BottomNavBar";
 
 const FACULTY_IMAGE =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBs_nuDOZI8b0LXnGPwlVMAVvPv3x7Wwy3GRF14ZCT3QycxHWwSYQml_IqpVh65vsu37hppsz3ERw9tfu6VbVPZebxushWkfgRx4hqCIRt3gulDmO8Ijm8_vybY_AtMzAcA7FHaH964F7nb7xXOOtvkylYcLFkKCKvc5tKwELHDOO-a8DxwkjkdN0KiI8Irb5sH52aXRTSKJDO0qB1QGvUKxwxxNhftj8DZ8aKoy1LhOopLEGncHwIM";
@@ -1008,7 +1009,7 @@ export default function StaffNotes({ navigation }) {
         </View>
       </ScrollView>
 
-      <BottomNavigation navigation={navigation} />
+      <BottomNavBar activeItem="notes" navigation={navigation} />
     </SafeAreaView>
   );
 }

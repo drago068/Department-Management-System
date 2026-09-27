@@ -13,6 +13,7 @@ import {
 
 import { BlurView } from 'expo-blur';
 import { MaterialIcons } from '@expo/vector-icons';
+import BottomNavBar from '../components/BottomNavBar';
 
 const NEXUS_LOGO =
   'https://lh3.googleusercontent.com/aida/AEtjO1Wvn-7DlspBmymBZsPXM5ofH-gwObYUZX7235q1CvfulTuqnJHFo7-dKK9FtRU_nF9bJmgVlSl3vIe_BLaa3RBjW9icQRFjWupeEupGTt0BOl5iIocHT6vlnlyxA4S2OwCvcTdTEwhoTDbAzsOpRo5PqdfOvY89KN0Ri2ZllbuoLjY-RwWFBXSYB1pBPQBVoQDDG3Q2XjZXSSNyxh92nncG92zKb44jRGkR1tHS9neOiyzZGqYdhtgy71qS3NQuFQJrzqFr3ErYDA';
@@ -505,83 +506,17 @@ export default function AdminProfile({ navigation }) {
         {/* ==================================================
             BOTTOM NAVIGATION
         ================================================== */}
-
-        <BlurView
-          intensity={90}
-          tint="light"
-          style={styles.bottomNavigation}
-        >
-
-          <View style={styles.bottomNavInner}>
-
-            {/* Home */}
-            <TouchableOpacity
-              style={styles.navItem}
-              activeOpacity={0.7}
-              onPress={() => navigation?.navigate('AdminDashboard')}
-            >
-              <MaterialIcons
-                name="dashboard"
-                size={24}
-                color="#434654"
-              />
-              <Text style={styles.navText}>
-                Home
-              </Text>
-            </TouchableOpacity>
-
-            {/* Reports */}
-            <TouchableOpacity
-              style={styles.navItem}
-              activeOpacity={0.7}
-              onPress={() => navigation?.navigate('ReportManagement')}
-            >
-              <MaterialIcons
-                name="summarize"
-                size={24}
-                color="#434654"
-              />
-              <Text style={styles.navText}>
-                Reports
-              </Text>
-            </TouchableOpacity>
-
-            {/* History */}
-            <TouchableOpacity
-              style={styles.navItem}
-              activeOpacity={0.7}
-              onPress={() => navigation?.navigate('AttendanceHistory')}
-            >
-              <MaterialIcons
-                name="calendar-month"
-                size={24}
-                color="#434654"
-              />
-              <Text style={styles.navText}>
-                History
-              </Text>
-            </TouchableOpacity>
-
-            {/* Profile Active */}
-            <TouchableOpacity
-              style={styles.navItem}
-              activeOpacity={0.7}
-              onPress={() => {}}
-            >
-              <MaterialIcons
-                name="person"
-                size={24}
-                color="#1a56db"
-              />
-              <Text style={styles.activeNavText}>
-                Profile
-              </Text>
-            </TouchableOpacity>
-
-          </View>
-
-        </BlurView>
-
+        <BottomNavBar
+          items={[
+            { key: 'home', label: 'Home', icon: 'dashboard', screen: 'AdminDashboard' },
+            { key: 'attendance', label: 'Attendance', icon: 'how-to-reg', screen: 'ReportManagement' },
+            { key: 'timetable', label: 'Timetable', icon: 'calendar-month', screen: 'AdminTimetable' },
+            { key: 'history', label: 'History', icon: 'history', screen: 'AttendanceHistory' },
+            { key: 'profile', label: 'Profile', icon: 'person', screen: 'AdminProfile' },
+          ]}
+          activeItem="profile"
+          navigation={navigation}
+        />
       </View>
 
     </SafeAreaView>

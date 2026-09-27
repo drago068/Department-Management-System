@@ -2,26 +2,48 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Colors from '../constants/colors';
-import Typography from '../constants/typography';
 
-const BottomNavBar = ({ items, activeItem, onItemPress }) => {
+const defaultStaffNavItems = [
+  { key: 'home', label: 'Home', icon: 'dashboard', screen: 'StaffDashboard' },
+  { key: 'attendance', label: 'Attendance', icon: 'how-to-reg', screen: 'MarkAttendance' },
+  { key: 'timetable', label: 'Timetable', icon: 'push-pin', screen: 'StaffTimetable' },
+  { key: 'notes', label: 'Notes & QP', icon: 'menu-book', screen: 'StaffNotes' },
+  { key: 'profile', label: 'Profile', icon: 'person', screen: 'StaffProfile' },
+];
+
+const BottomNavBar = ({ items, activeItem, onItemPress, navigation }) => {
+  const navList = items && items.length > 0 ? items : defaultStaffNavItems;
+
+  const handlePress = (item) => {
+    if (onItemPress) {
+      onItemPress(item);
+    } else if (item.screen && navigation) {
+      navigation?.navigate(item.screen);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {items.map((item, index) => {
+      {navList.map((item, index) => {
         const isActive = activeItem === item.key;
         return (
           <TouchableOpacity
             key={item.key || index}
-            style={[styles.navItem, isActive && styles.navItemActive]}
-            onPress={() => onItemPress && onItemPress(item)}
+            style={styles.navItem}
+            onPress={() => handlePress(item)}
             activeOpacity={0.7}
           >
-            <MaterialIcons
-              name={item.icon}
-              size={24}
-              color={isActive ? Colors.onPrimaryContainer : Colors.onSurfaceVariant}
-            />
-            <Text style={[styles.navItemText, isActive && styles.navItemTextActive]}>
+            <View style={[styles.iconWrap, isActive && styles.iconWrapActive]}>
+              <MaterialIcons
+                name={item.icon}
+                size={22}
+                color={isActive ? '#003fb1' : '#585f6c'}
+              />
+            </View>
+            <Text
+              style={[styles.navItemText, isActive && styles.navItemTextActive]}
+              numberOfLines={1}
+            >
               {item.label}
             </Text>
           </TouchableOpacity>
@@ -37,36 +59,42 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     height: 64,
-    paddingHorizontal: 16,
-    backgroundColor: Colors.surfaceContainerLowest,
+    paddingHorizontal: 4,
+    backgroundColor: '#ffffff',
     borderTopWidth: 1,
-    borderTopColor: Colors.outlineVariant,
+    borderTopColor: '#e2e8f0',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 8,
   },
   navItem: {
+    flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 16,
     paddingVertical: 4,
-    borderRadius: 9999,
   },
-  navItemActive: {
-    backgroundColor: Colors.primaryContainer,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
+  iconWrap: {
+    width: 44,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconWrapActive: {
+    backgroundColor: '#dbe1ff',
   },
   navItemText: {
-    ...Typography.labelSm,
-    color: Colors.onSurfaceVariant,
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#585f6c',
     marginTop: 2,
   },
   navItemTextActive: {
-    color: Colors.onPrimaryContainer,
+    fontWeight: '700',
+    color: '#003fb1',
   },
 });
 
