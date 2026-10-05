@@ -1,32 +1,66 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, ActivityIndicator, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Colors from '../constants/colors';
 import Typography from '../constants/typography';
 import TopAppBar from '../components/TopAppBar';
 import BottomNavBar from '../components/BottomNavBar';
+import { getSessionRoster, submitAttendance } from '../src/api/attendance';
 
-const MarkAttendance = ({ navigation }) => {
-  const [selectedDate] = useState('2024-09-06');
-  const [selectedPeriod, setSelectedPeriod] = useState('Period 1');
+const MarkAttendance = ({ navigation, route }) => {
+  // Params passed from StaffTimetable when tapping "Mark Attendance"
+  const {
+    timetableEntryId,
+    markingDate,
+    subjectName = 'Class Session',
+    sectionName = '',
+    roomName = '',
+  } = route?.params || {};
 
-  const students = [
-    { id: 'CS2024-001', name: 'Arjun Patel', status: 'present' },
-    { id: 'CS2024-002', name: 'Priya Sharma', status: 'present' },
-    { id: 'CS2024-003', name: 'Rahul Verma', status: 'absent' },
-    { id: 'CS2024-004', name: 'Sneha Gupta', status: 'present' },
-    { id: 'CS2024-005', name: 'Vikram Singh', status: 'present' },
-    { id: 'CS2024-006', name: 'Ananya Iyer', status: 'od' },
-    { id: 'CS2024-007', name: 'Karthik Rajan', status: 'present' },
-    { id: 'CS2024-008', name: 'Meera Nair', status: 'present' },
-    { id: 'CS2024-009', name: 'Aditya Kumar', status: 'absent' },
-    { id: 'CS2024-010', name: 'Divya Menon', status: 'present' },
-  ];
+  const today = new Date().toISOString().split('T')[0];
+  const selectedDate = markingDate || today;
 
-  const [studentStates, setStudentStates] = useState(
-    students.map((s) => ({ ...s }))
-  );
+  const [roster, setRoster] = useState(null);  // null = not yet loaded
+  const [studentStates, setStudentStates] = useState([]);
+  const [loadingRoster, setLoadingRoster] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [rosterError, setRosterError] = useState('');
 
+  // ── Fetch session roster from backend ──────────────────────────────────────
+  const fetchRoster = useCallback(async () => {
+    if (!timetableEntryId) {
+      // No params → screen opened directly (dev preview), use demo data
+      setStudentStates([
+        { id: 'DEMO-001', name: 'Demo Student A', roll_no: '001', status: 'PRESENT' },
+        { id: 'DEMO-002', name: 'Demo Student B', roll_no: '002', status: 'ABSENT' },
+        { id: 'DEMO-003', name: 'Demo Student C', roll_no: '003', status: 'PRESENT' },
+      ]);
+      setLoadingRoster(false);
+      return;
+    }
+    setLoadingRoster(true);
+    setRosterError('');
+    try {
+      const data = await getSessionRoster(timetableEntryId, selectedDate);
+      setRoster(data);
+      // Map backend roster to local editable state
+      const mapped = (data.students || []).map((s) => ({
+        id: s.student_id,
+        name: s.full_name,
+        roll_no: s.roll_no,
+        status: s.existing_status || 'PRESENT',
+      }));
+      setStudentStates(mapped);
+    } catch (err) {
+      setRosterError(err.message || 'Failed to load student roster.');
+    } finally {
+      setLoadingRoster(false);
+    }
+  }, [timetableEntryId, selectedDate]);
+
+  useEffect(() => { fetchRoster(); }, [fetchRoster]);
+
+  // ── Toggle status ──────────────────────────────────────────────────────────
   const toggleStatus = (index, newStatus) => {
     setStudentStates((prev) => {
       const updated = [...prev];
@@ -35,15 +69,42 @@ const MarkAttendance = ({ navigation }) => {
     });
   };
 
-  const statusColors = {
-    present: { bg: '#dcfce7', text: '#166534', icon: 'check-circle' },
-    absent: { bg: '#fee2e2', text: '#b91c1c', icon: 'cancel' },
-    od: { bg: '#ffedd5', text: '#c2410c', icon: 'assignment-ind' },
+  // ── Submit attendance ──────────────────────────────────────────────────────
+  const handleSubmit = async () => {
+    if (!timetableEntryId) {
+      Alert.alert('Demo Mode', 'Open this screen from your timetable to submit real attendance.');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const records = studentStates.map((s) => ({
+        student_id: s.id,
+        status: s.status,
+      }));
+      await submitAttendance({
+        timetable_entry_id: timetableEntryId,
+        marking_date: selectedDate,
+        records,
+      });
+      Alert.alert('Success', 'Attendance submitted successfully!', [
+        { text: 'OK', onPress: () => navigation?.goBack() },
+      ]);
+    } catch (err) {
+      Alert.alert('Submission Failed', err.message || 'Could not submit attendance. Try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const presentCount = studentStates.filter((s) => s.status === 'present').length;
-  const absentCount = studentStates.filter((s) => s.status === 'absent').length;
-  const odCount = studentStates.filter((s) => s.status === 'od').length;
+  const statusColors = {
+    PRESENT: { bg: '#dcfce7', text: '#166534', icon: 'check-circle' },
+    ABSENT: { bg: '#fee2e2', text: '#b91c1c', icon: 'cancel' },
+    OD: { bg: '#ffedd5', text: '#c2410c', icon: 'assignment-ind' },
+  };
+
+  const presentCount = studentStates.filter((s) => s.status === 'PRESENT').length;
+  const absentCount = studentStates.filter((s) => s.status === 'ABSENT').length;
+  const odCount = studentStates.filter((s) => s.status === 'OD').length;
 
   const bottomNavItems = [
     { key: 'home', label: 'Home', icon: 'dashboard' },
@@ -51,6 +112,7 @@ const MarkAttendance = ({ navigation }) => {
     { key: 'notes', label: 'Notes & QP', icon: 'menu-book' },
     { key: 'profile', label: 'Profile', icon: 'person' },
   ];
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -69,97 +131,116 @@ const MarkAttendance = ({ navigation }) => {
           <View style={styles.classInfoCard}>
             <View style={styles.classInfoRow}>
               <View>
-                <Text style={styles.className}>CS-101: Data Structures</Text>
-                <Text style={styles.classDetail}>B.Tech Semester 3 • Room 402</Text>
+                <Text style={styles.className}>{subjectName}</Text>
+                <Text style={styles.classDetail}>{sectionName}{roomName ? ` • ${roomName}` : ''}</Text>
               </View>
               <View style={styles.dateBadge}>
                 <MaterialIcons name="calendar-today" size={14} color={Colors.primary} />
                 <Text style={styles.dateText}>{selectedDate}</Text>
               </View>
             </View>
-            {/* Period selector */}
-            <View style={styles.periodRow}>
-              {['Period 1', 'Period 2', 'Period 3'].map((p) => (
-                <TouchableOpacity
-                  key={p}
-                  style={[styles.periodChip, selectedPeriod === p && styles.periodChipActive]}
-                  onPress={() => setSelectedPeriod(p)}
-                >
-                  <Text style={[styles.periodText, selectedPeriod === p && styles.periodTextActive]}>{p}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
           </View>
 
-          {/* Summary Stats */}
-          <View style={styles.summaryRow}>
-            <View style={[styles.summaryCard, { borderLeftColor: '#22c55e' }]}>
-              <Text style={styles.summaryCount}>{presentCount}</Text>
-              <Text style={styles.summaryLabel}>Present</Text>
+          {/* Loading State */}
+          {loadingRoster && (
+            <View style={styles.centeredState}>
+              <ActivityIndicator size="large" color={Colors.primary} />
+              <Text style={styles.stateText}>Loading student roster…</Text>
             </View>
-            <View style={[styles.summaryCard, { borderLeftColor: '#ef4444' }]}>
-              <Text style={styles.summaryCount}>{absentCount}</Text>
-              <Text style={styles.summaryLabel}>Absent</Text>
-            </View>
-            <View style={[styles.summaryCard, { borderLeftColor: '#f97316' }]}>
-              <Text style={styles.summaryCount}>{odCount}</Text>
-              <Text style={styles.summaryLabel}>OD</Text>
-            </View>
-          </View>
+          )}
 
-          {/* Student List */}
-          <View style={styles.studentListCard}>
-            <View style={styles.studentListHeader}>
-              <Text style={styles.sectionTitle}>Student List</Text>
-              <Text style={styles.totalCount}>{studentStates.length} students</Text>
+          {/* Error State */}
+          {!!rosterError && !loadingRoster && (
+            <View style={styles.errorBanner}>
+              <MaterialIcons name="error-outline" size={18} color="#b91c1c" />
+              <Text style={styles.errorText}>{rosterError}</Text>
+              <TouchableOpacity onPress={fetchRoster}>
+                <Text style={styles.retryText}>Retry</Text>
+              </TouchableOpacity>
             </View>
-            {studentStates.map((student, index) => {
-              const sc = statusColors[student.status];
-              return (
-                <View key={student.id} style={styles.studentRow}>
-                  <View style={styles.studentInfo}>
-                    <View style={styles.studentAvatar}>
-                      <Text style={styles.studentAvatarText}>{student.name.charAt(0)}</Text>
-                    </View>
-                    <View>
-                      <Text style={styles.studentName}>{student.name}</Text>
-                      <Text style={styles.studentId}>{student.id}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.statusButtons}>
-                    <TouchableOpacity
-                      style={[styles.statusBtn, student.status === 'present' && { backgroundColor: statusColors.present.bg }]}
-                      onPress={() => toggleStatus(index, 'present')}
-                    >
-                      <MaterialIcons name="check" size={18} color={student.status === 'present' ? statusColors.present.text : Colors.outline} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.statusBtn, student.status === 'absent' && { backgroundColor: statusColors.absent.bg }]}
-                      onPress={() => toggleStatus(index, 'absent')}
-                    >
-                      <MaterialIcons name="close" size={18} color={student.status === 'absent' ? statusColors.absent.text : Colors.outline} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.statusBtn, student.status === 'od' && { backgroundColor: statusColors.od.bg }]}
-                      onPress={() => toggleStatus(index, 'od')}
-                    >
-                      <Text style={[styles.odText, student.status === 'od' && { color: statusColors.od.text }]}>OD</Text>
-                    </TouchableOpacity>
-                  </View>
+          )}
+
+          {/* Content when loaded */}
+          {!loadingRoster && !rosterError && (
+            <>
+              {/* Summary Stats */}
+              <View style={styles.summaryRow}>
+                <View style={[styles.summaryCard, { borderLeftColor: '#22c55e' }]}>
+                  <Text style={styles.summaryCount}>{presentCount}</Text>
+                  <Text style={styles.summaryLabel}>Present</Text>
                 </View>
-              );
-            })}
-          </View>
+                <View style={[styles.summaryCard, { borderLeftColor: '#ef4444' }]}>
+                  <Text style={styles.summaryCount}>{absentCount}</Text>
+                  <Text style={styles.summaryLabel}>Absent</Text>
+                </View>
+                <View style={[styles.summaryCard, { borderLeftColor: '#f97316' }]}>
+                  <Text style={styles.summaryCount}>{odCount}</Text>
+                  <Text style={styles.summaryLabel}>OD</Text>
+                </View>
+              </View>
 
-          {/* Submit Button */}
-          <TouchableOpacity
-            style={styles.submitButton}
-            activeOpacity={0.8}
-            onPress={() => navigation?.navigate('AttendanceReview')}
-          >
-            <MaterialIcons name="check-circle" size={20} color={Colors.onPrimary} />
-            <Text style={styles.submitButtonText}>Review & Submit Attendance</Text>
-          </TouchableOpacity>
+              {/* Student List */}
+              <View style={styles.studentListCard}>
+                <View style={styles.studentListHeader}>
+                  <Text style={styles.sectionTitle}>Student List</Text>
+                  <Text style={styles.totalCount}>{studentStates.length} students</Text>
+                </View>
+                {studentStates.map((student, index) => {
+                  const sc = statusColors[student.status] || statusColors.PRESENT;
+                  return (
+                    <View key={student.id} style={styles.studentRow}>
+                      <View style={styles.studentInfo}>
+                        <View style={styles.studentAvatar}>
+                          <Text style={styles.studentAvatarText}>{student.name.charAt(0)}</Text>
+                        </View>
+                        <View>
+                          <Text style={styles.studentName}>{student.name}</Text>
+                          <Text style={styles.studentId}>{student.roll_no || student.id}</Text>
+                        </View>
+                      </View>
+                      <View style={styles.statusButtons}>
+                        <TouchableOpacity
+                          style={[styles.statusBtn, student.status === 'PRESENT' && { backgroundColor: statusColors.PRESENT.bg }]}
+                          onPress={() => toggleStatus(index, 'PRESENT')}
+                        >
+                          <MaterialIcons name="check" size={18} color={student.status === 'PRESENT' ? statusColors.PRESENT.text : Colors.outline} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[styles.statusBtn, student.status === 'ABSENT' && { backgroundColor: statusColors.ABSENT.bg }]}
+                          onPress={() => toggleStatus(index, 'ABSENT')}
+                        >
+                          <MaterialIcons name="close" size={18} color={student.status === 'ABSENT' ? statusColors.ABSENT.text : Colors.outline} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[styles.statusBtn, student.status === 'OD' && { backgroundColor: statusColors.OD.bg }]}
+                          onPress={() => toggleStatus(index, 'OD')}
+                        >
+                          <Text style={[styles.odText, student.status === 'OD' && { color: statusColors.OD.text }]}>OD</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+
+              {/* Submit Button */}
+              <TouchableOpacity
+                style={[styles.submitButton, submitting && { opacity: 0.75 }]}
+                activeOpacity={0.8}
+                onPress={handleSubmit}
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <ActivityIndicator size="small" color={Colors.onPrimary} />
+                ) : (
+                  <>
+                    <MaterialIcons name="check-circle" size={20} color={Colors.onPrimary} />
+                    <Text style={styles.submitButtonText}>Submit Attendance</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </ScrollView>
       <BottomNavBar
@@ -170,10 +251,21 @@ const MarkAttendance = ({ navigation }) => {
   );
 };
 
+
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: Colors.background },
   content: { flex: 1 },
   contentInner: { padding: 16, paddingBottom: 80, gap: 16 },
+  centeredState: { alignItems: 'center', paddingVertical: 40, gap: 12 },
+  stateText: { fontSize: 14, color: Colors.onSurfaceVariant },
+  errorBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca',
+    borderRadius: 10, padding: 12,
+  },
+  errorText: { flex: 1, fontSize: 13, color: '#b91c1c' },
+  retryText: { fontSize: 13, color: Colors.primary, fontWeight: '700' },
+
   classInfoCard: {
     backgroundColor: Colors.surfaceContainerLowest, borderRadius: 12, padding: 16,
     borderWidth: 1, borderColor: 'rgba(195,197,215,0.3)', gap: 12,

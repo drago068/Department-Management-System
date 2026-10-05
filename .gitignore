@@ -1,16 +1,19 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
-# dependencies
+# ── Node / Expo ────────────────────────────────────────────────────────────────
 node_modules/
-
-# Expo
-.agents/
 .expo/
 dist/
 web-build/
 expo-env.d.ts
+.metro-health-check*
 
-# Native
+# ── Debug logs ────────────────────────────────────────────────────────────────
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# ── Native signing / certs ────────────────────────────────────────────────────
 .kotlin/
 *.orig.*
 *.jks
@@ -18,25 +21,69 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
-
-# Metro
-.metro-health-check*
-
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# macOS
-.DS_Store
 *.pem
 
-# local env files
-.env*.local
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
 
-# typescript
+# ── TypeScript ────────────────────────────────────────────────────────────────
 *.tsbuildinfo
 
-# generated native folders
+# ── Generated native folders ──────────────────────────────────────────────────
 /ios
 /android
+
+# ── Local env files (ALL variants) ───────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+backend/.env
+backend/.env.local
+backend/.env.*.local
+backend/.env.development
+backend/.env.production
+backend/.env.test
+# NOTE: .env.example IS intentionally committed (it has no secrets)
+
+# ── Python & Backend ──────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+backend/.venv/
+backend/venv/
+
+# SQLite databases (local dev only — Supabase is used in production)
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploaded files (stored in Supabase Storage or S3 in production)
+uploads/
+backend/uploads/
+
+# Alembic stray files at root (alembic lives inside backend/)
+/alembic.ini
+/alembic/
+
+# ── IDE & Editor ──────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Agent/AI config (workspace-local) ────────────────────────────────────────
+.agents/

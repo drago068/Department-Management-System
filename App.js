@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'react-native';
+import { AuthProvider } from './src/context/AuthContext';
 
 import LoginPage from './screens/LoginPage';
 import StudentLogin from './screens/StudentLogin';
@@ -32,7 +33,7 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <>
+    <AuthProvider>
       <StatusBar barStyle="dark-content" backgroundColor="#faf8ff" />
       <NavigationContainer>
         <Stack.Navigator
@@ -76,6 +77,6 @@ export default function App() {
           <Stack.Screen name="ReportManagement" component={ReportManagement} />
         </Stack.Navigator>
       </NavigationContainer>
-    </>
+    </AuthProvider>
   );
 }

@@ -1,17 +1,36 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Colors from '../constants/colors';
 import Typography from '../constants/typography';
+import { login } from '../src/api/auth';
+import { useAuth } from '../src/context/AuthContext';
 
 const StaffLogin = ({ navigation }) => {
+  const { signIn } = useAuth();
   const [staffId, setStaffId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleLogin = () => {
-    navigation.navigate('StaffDashboard');
+  const handleLogin = async () => {
+    if (!staffId.trim() || !password) {
+      setError('Please enter your Staff ID and Password.');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      const tokenData = await login(staffId, password, 'STAFF');
+      signIn(tokenData);
+      navigation.replace('StaffDashboard');
+    } catch (err) {
+      setError(err.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -117,10 +136,29 @@ const StaffLogin = ({ navigation }) => {
               <Text style={styles.checkboxLabel}>Remember my credentials</Text>
             </TouchableOpacity>
 
+            {/* Error Banner */}
+            {!!error && (
+              <View style={styles.errorBanner}>
+                <MaterialIcons name="error-outline" size={16} color="#b91c1c" />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )}
+
             {/* Login Button */}
-            <TouchableOpacity style={styles.submitButton} onPress={handleLogin} activeOpacity={0.8}>
-              <Text style={styles.submitButtonText}>Log In to Portal</Text>
-              <MaterialIcons name="arrow-forward" size={20} color={Colors.onPrimary} />
+            <TouchableOpacity
+              style={[styles.submitButton, loading && { opacity: 0.75 }]}
+              onPress={handleLogin}
+              activeOpacity={0.8}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color={Colors.onPrimary} />
+              ) : (
+                <>
+                  <Text style={styles.submitButtonText}>Log In to Portal</Text>
+                  <MaterialIcons name="arrow-forward" size={20} color={Colors.onPrimary} />
+                </>
+              )}
             </TouchableOpacity>
 
             {/* Quick Access to Common Hub */}
@@ -345,6 +383,24 @@ const styles = StyleSheet.create({
     ...Typography.labelMd,
     color: Colors.onPrimary,
     fontWeight: '700',
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#fef2f2',
+    borderWidth: 1,
+    borderColor: '#fecaca',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#b91c1c',
+    fontWeight: '500',
   },
   commonHubRow: {
     flexDirection: 'row',

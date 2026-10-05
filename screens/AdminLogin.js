@@ -1,18 +1,37 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Colors from '../constants/colors';
 import Typography from '../constants/typography';
+import { login } from '../src/api/auth';
+import { useAuth } from '../src/context/AuthContext';
 
 const AdminLogin = ({ navigation }) => {
+  const { signIn } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [twoFA, setTwoFA] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleLogin = () => {
-    navigation.navigate('AdminDashboard');
+  const handleLogin = async () => {
+    if (!username.trim() || !password) {
+      setError('Please enter your Username and Password.');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      const tokenData = await login(username, password, 'ADMIN');
+      signIn(tokenData);
+      navigation.replace('AdminDashboard');
+    } catch (err) {
+      setError(err.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -148,10 +167,29 @@ const AdminLogin = ({ navigation }) => {
               <Text style={styles.checkboxLabel}>Trust this device for 30 days</Text>
             </TouchableOpacity>
 
+            {/* Error Banner */}
+            {!!error && (
+              <View style={styles.errorBanner}>
+                <MaterialIcons name="error-outline" size={16} color="#b91c1c" />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )}
+
             {/* Submit Button */}
-            <TouchableOpacity style={styles.submitButton} onPress={handleLogin} activeOpacity={0.8}>
-              <MaterialIcons name="verified-user" size={20} color={Colors.onPrimary} />
-              <Text style={styles.submitButtonText}>Authorize Session</Text>
+            <TouchableOpacity
+              style={[styles.submitButton, loading && { opacity: 0.75 }]}
+              onPress={handleLogin}
+              activeOpacity={0.8}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color={Colors.onPrimary} />
+              ) : (
+                <>
+                  <MaterialIcons name="verified-user" size={20} color={Colors.onPrimary} />
+                  <Text style={styles.submitButtonText}>Authorize Session</Text>
+                </>
+              )}
             </TouchableOpacity>
 
             {/* Quick Access to Common Hub */}
@@ -416,6 +454,24 @@ const styles = StyleSheet.create({
     ...Typography.labelMd,
     color: Colors.onPrimary,
     fontWeight: '700',
+  },
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#fef2f2',
+    borderWidth: 1,
+    borderColor: '#fecaca',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#b91c1c',
+    fontWeight: '500',
   },
   commonHubRow: {
     flexDirection: 'row',

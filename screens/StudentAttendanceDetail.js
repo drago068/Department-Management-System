@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { getStudentAttendanceSummary } from '../src/api/attendance';
 import {
   SafeAreaView,
   View,
@@ -282,7 +283,9 @@ function MetricBox({
   );
 }
 
-function AttendanceCard() {
+function AttendanceCard({ overallPct = 88.4, totalAttended = 60, totalConducted = 68, canMiss = 6 }) {
+  const zone = overallPct >= 75 ? 'Safe Zone' : 'At Risk';
+  const absences = totalConducted - totalAttended;
   return (
     <View style={styles.attendanceCard}>
       <View style={styles.attendanceHeader}>
@@ -299,8 +302,8 @@ function AttendanceCard() {
         <View style={styles.safeBadge}>
           <View style={styles.safeDot} />
 
-          <Text style={styles.safeText}>
-            Safe Zone
+          <Text style={[styles.safeText, { color: overallPct >= 75 ? '#166534' : '#b91c1c' }]}>
+            {zone}
           </Text>
         </View>
       </View>
@@ -311,20 +314,20 @@ function AttendanceCard() {
         <View style={styles.metricGrid}>
           <MetricBox
             label="Working Days"
-            value="68"
+            value={String(totalConducted)}
             description="Total active"
           />
 
           <MetricBox
             label="Attended"
-            value="60"
-            description="88.2% present"
+            value={String(totalAttended)}
+            description={`${overallPct.toFixed(1)}% present`}
             color={COLORS.primary}
           />
 
           <MetricBox
             label="Absences"
-            value="04"
+            value={absences < 10 ? `0${absences}` : String(absences)}
             description="Medical allowed"
             color={COLORS.error}
           />
@@ -373,7 +376,7 @@ function AttendanceCard() {
           <Text style={styles.runwayText}>
             You can miss up to{" "}
             <Text style={styles.highlight}>
-              6 more periods
+              {canMiss} more periods
             </Text>{" "}
             without slipping below the required 75.0% threshold.
           </Text>
@@ -458,7 +461,8 @@ function SubjectCard({ subject }) {
   );
 }
 
-function SubjectSection() {
+function SubjectSection({ subjects: subjectList }) {
+  const displaySubjects = subjectList || subjects;
   return (
     <View style={styles.subjectSection}>
       <View style={styles.subjectSectionHeader}>
@@ -475,11 +479,11 @@ function SubjectSection() {
         </View>
 
         <Text style={styles.subjectCount}>
-          5 Subjects
+          {displaySubjects.length} Subjects
         </Text>
       </View>
 
-      {subjects.map((subject) => (
+      {displaySubjects.map((subject) => (
         <SubjectCard
           key={subject.code}
           subject={subject}
@@ -612,6 +616,44 @@ function BottomNavigation({ navigation }) {
 }
 
 export default function StudentAttendanceDetail({ navigation }) {
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getStudentAttendanceSummary()
+      .then((data) => {
+        setSummary(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false)); // fall back to mock data
+  }, []);
+
+  // Map API subject list to the shape SubjectCard expects
+  const liveSubjects = summary?.subjects?.map((s) => ({
+    code: s.course_code,
+    credits: '3 Credits',
+    name: s.course_name,
+    staff: s.staff_name || '',
+    percentage: `${parseFloat(s.percentage || 0).toFixed(1)}%`,
+    hours: `${s.attended_hours || 0} / ${s.total_hours || 0} hrs`,
+    progress: parseFloat(s.percentage || 0),
+    status: parseFloat(s.percentage || 0) >= 85 ? 'Status: Excellent'
+           : parseFloat(s.percentage || 0) >= 75 ? 'Status: Safe' : 'Status: At Risk',
+    note: (s.max_absences_allowed || 0) > 0
+           ? `Max Absences Allowed: ${s.max_absences_allowed} more`
+           : 'Needs classes to reach 75%',
+    color: COLORS.primary,
+  })) || subjects; // fall back to mock when API not available
+
+  const overallPct = summary?.overall_percentage ?? 88.4;
+  // Backend uses total_attended_hours / total_conducted_hours
+  const totalAttended = summary?.total_attended_hours ?? 60;
+  const totalConducted = summary?.total_conducted_hours ?? 68;
+  // Compute safety runway: min of max_absences_allowed across subjects
+  const canMiss = summary?.subjects?.length
+    ? Math.min(...summary.subjects.map((s) => s.max_absences_allowed))
+    : 6;
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar
@@ -628,9 +670,14 @@ export default function StudentAttendanceDetail({ navigation }) {
       >
         <StudentIdentity />
 
-        <AttendanceCard />
+        <AttendanceCard
+          overallPct={overallPct}
+          totalAttended={totalAttended}
+          totalConducted={totalConducted}
+          canMiss={canMiss}
+        />
 
-        <SubjectSection />
+        <SubjectSection subjects={liveSubjects} />
 
         <Regulations />
 

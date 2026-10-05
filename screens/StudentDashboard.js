@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getStudentAttendanceSummary } from '../src/api/attendance';
+import { useAuth } from '../src/context/AuthContext';
 import {
   SafeAreaView,
   View,
@@ -170,13 +172,14 @@ function AcademicHeader() {
   );
 }
 
-function StudentProfileCard() {
+function StudentProfileCard({ user }) {
+  const displayName = user?.profile?.full_name || 'Student';
   return (
     <View style={styles.profileCard}>
       <View style={styles.profileTop}>
         <View style={styles.studentImageContainer}>
           <Image
-            source={{ uri: STUDENT_IMAGE }}
+            source={{ uri: user?.profile?.avatar_url || STUDENT_IMAGE }}
             style={styles.studentImage}
           />
 
@@ -195,7 +198,7 @@ function StudentProfileCard() {
               style={styles.studentName}
               numberOfLines={1}
             >
-              HELLO, GNANA PRAKASH V
+              HELLO, {displayName.toUpperCase()}
             </Text>
 
             <Text style={styles.wave}>👋</Text>
@@ -242,7 +245,17 @@ function StudentProfileCard() {
   );
 }
 
-function AttendanceOverview({ onPress }) {
+function AttendanceOverview({ onPress, summary }) {
+  const overallPct = summary?.overall_percentage ?? 88.4;
+  // Backend uses total_attended_hours / total_conducted_hours
+  const attended = summary?.total_attended_hours ?? 60;
+  const total = summary?.total_conducted_hours ?? 68;
+  // Compute safety runway from subjects array
+  const canMiss = summary?.subjects?.length
+    ? Math.min(...summary.subjects.map((s) => s.max_absences_allowed))
+    : 6;
+  const zone = overallPct >= 85 ? 'Safe Zone' : overallPct >= 75 ? 'Caution' : 'At Risk';
+  const zoneColor = overallPct >= 85 ? '#166534' : overallPct >= 75 ? '#c2410c' : '#b91c1c';
   return (
     <TouchableOpacity
       style={styles.attendanceSection}
@@ -259,29 +272,33 @@ function AttendanceOverview({ onPress }) {
           </View>
 
           <View style={styles.safeBadge}>
-            <Text style={styles.safeBadgeText}>
-              Safe Zone • 88.4%
+            <Text style={[styles.safeBadgeText, { color: zoneColor }]}>
+              {zone} • {overallPct.toFixed(1)}%
             </Text>
           </View>
         </View>
 
         <View style={styles.attendanceBriefRow}>
           <View style={styles.briefItem}>
-            <Text style={styles.briefVal}>60 / 68</Text>
+            <Text style={styles.briefVal}>{attended} / {total}</Text>
             <Text style={styles.briefLbl}>Sessions Attended</Text>
           </View>
 
           <View style={styles.briefDivider} />
 
           <View style={styles.briefItem}>
-            <Text style={[styles.briefVal, { color: "#166534" }]}>Satisfied</Text>
+            <Text style={[styles.briefVal, { color: overallPct >= 75 ? '#166534' : '#b91c1c' }]}>
+              {overallPct >= 75 ? 'Satisfied' : 'Below 75%'}
+            </Text>
             <Text style={styles.briefLbl}>AU 75% Criteria</Text>
           </View>
 
           <View style={styles.briefDivider} />
 
           <View style={styles.briefItem}>
-            <Text style={[styles.briefVal, { color: "#003fb1" }]}>+6 Classes</Text>
+            <Text style={[styles.briefVal, { color: '#003fb1' }]}>
+              {canMiss} Classes
+            </Text>
             <Text style={styles.briefLbl}>Safety Runway</Text>
           </View>
         </View>
@@ -499,7 +516,16 @@ function BottomNavigation({ navigation }) {
 }
 
 export default function StudentDashboard({ navigation }) {
+  const { user } = useAuth();
   const [activeModal, setActiveModal] = useState(null);
+  const [attendanceSummary, setAttendanceSummary] = useState(null);
+
+  // Fetch live attendance summary on mount
+  useEffect(() => {
+    getStudentAttendanceSummary()
+      .then(setAttendanceSummary)
+      .catch(() => {}); // silently fall back to mock values
+  }, []);
 
   const openQFix = () => {
     Linking.openURL("https://www.eduqfix.com/PayDirect/#/student").catch((err) =>
@@ -541,12 +567,13 @@ export default function StudentDashboard({ navigation }) {
           {/* Student Greeting */}
           <View style={styles.greetingSection}>
             <AcademicHeader />
-            <StudentProfileCard />
+            <StudentProfileCard user={user} />
           </View>
 
           {/* Attendance Gateway */}
           <AttendanceOverview
             onPress={() => navigation?.navigate("StudentAttendanceDetail")}
+            summary={attendanceSummary}
           />
 
           {/* Campus Services */}
