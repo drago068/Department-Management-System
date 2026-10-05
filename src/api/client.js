@@ -101,8 +101,9 @@ export async function apiRequest(path, options = {}, retry = true) {
   const url = path.startsWith('http') ? path : `${BASE_URL}${path}`;
   const res = await fetch(url, { ...options, headers });
 
-  // ── 401 → try token refresh ──
-  if (res.status === 401 && retry) {
+  // ── 401 → try token refresh (skip for auth endpoints) ──
+  const isAuthEndpoint = path.includes('/auth/login') || path.includes('/auth/refresh');
+  if (res.status === 401 && retry && !isAuthEndpoint) {
     if (isRefreshing) {
       // Queue subsequent requests while refresh is in progress
       return new Promise((resolve, reject) => {
@@ -128,17 +129,25 @@ export async function apiRequest(path, options = {}, retry = true) {
     }
   }
 
-  const json = await res.json();
+  let json = null;
+  try {
+    json = await res.json();
+  } catch {
+    // Non-JSON response
+  }
 
   if (!res.ok) {
-    // Normalize FastAPI validation errors and custom errors
+    // Normalize FastAPI validation errors and custom StandardResponse errors
     const detail = json?.detail;
     if (Array.isArray(detail)) {
-      throw new Error(detail.map((e) => e.msg).join(', '));
+      throw new Error(detail.map((e) => e.msg || e).join(', '));
     }
-    throw new Error(
-      typeof detail === 'string' ? detail : json?.message || `Error ${res.status}`
-    );
+    const errMsg =
+      json?.error?.message ||
+      (typeof detail === 'string' ? detail : null) ||
+      json?.message ||
+      `Error ${res.status}`;
+    throw new Error(errMsg);
   }
 
   // Unwrap StandardResponse envelope → return .data

@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta, timezone
-from sqlalchemy import select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from app.core.config import settings
 from app.core.exceptions import AppException, ForbiddenException, UnauthorizedException
 from app.core.security import create_access_token, generate_refresh_token, verify_password
+from app.models.profiles import AdminProfile, Staff, Student
 from app.models.user import RefreshToken, User
 from app.schemas.auth import LoginRequest, TokenResponseData, UserAuthResponse, UserProfileSummary
 
@@ -12,19 +13,49 @@ from app.schemas.auth import LoginRequest, TokenResponseData, UserAuthResponse, 
 class AuthService:
     @staticmethod
     async def login(db: AsyncSession, request: LoginRequest, ip_address: str = None) -> TokenResponseData:
+        ident = request.identifier.strip().lower()
         stmt = (
             select(User)
+            .outerjoin(Student, User.id == Student.user_id)
+            .outerjoin(Staff, User.id == Staff.user_id)
+            .outerjoin(AdminProfile, User.id == AdminProfile.user_id)
             .options(
                 selectinload(User.student_profile),
                 selectinload(User.staff_profile),
                 selectinload(User.admin_profile),
             )
-            .where(User.identifier == request.identifier)
+            .where(
+                or_(
+                    func.lower(User.identifier) == ident,
+                    func.lower(Student.roll_number) == ident,
+                    func.lower(Student.register_number) == ident,
+                    func.lower(Student.email) == ident,
+                    func.lower(Staff.faculty_id) == ident,
+                    func.lower(Staff.email) == ident,
+                    func.lower(AdminProfile.email) == ident,
+                )
+            )
         )
         result = await db.execute(stmt)
-        user = result.scalar_one_or_none()
+        users = result.scalars().all()
 
-        if not user or not verify_password(request.password, user.password_hash):
+        if not users:
+            raise UnauthorizedException(
+                message="Invalid identifier or password",
+                details={"code": "INVALID_CREDENTIALS"},
+            )
+
+        # Match user by role if requested, otherwise take first match
+        user = None
+        if request.role:
+            for u in users:
+                if u.role.upper() == request.role.upper():
+                    user = u
+                    break
+        if not user:
+            user = users[0]
+
+        if not verify_password(request.password, user.password_hash):
             raise UnauthorizedException(
                 message="Invalid identifier or password",
                 details={"code": "INVALID_CREDENTIALS"},
