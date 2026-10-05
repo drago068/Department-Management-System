@@ -1,0 +1,680 @@
+
+### Core identity & organization
+
+```text
+users
+departments
+academic_years
+semesters
+batches
+sections
+```
+
+**`users`**
+- id
+- username/identifier
+- password_hash
+- role
+- is_active
+- created_at
+- updated_at
+- last_login
+
+**`departments`**
+- id
+- name
+- code
+- description
+
+**`academic_years`**
+- id
+- name
+- start_date
+- end_date
+- is_current
+
+**`semesters`**
+- id
+- academic_year_id
+- semester_number
+- start_date
+- end_date
+- is_current
+
+**`batches`**
+- id
+- department_id
+- year
+- start_year
+- graduation_year
+
+**`sections`**
+- id
+- batch_id
+- name
+- semester_id
+
+---
+
+### 👨‍🎓 Student
+
+```text
+students
+student_profiles
+```
+
+I would actually keep most identity information in `users` and academic information in `students`.
+
+**`students`**
+- id
+- user_id
+- register_number
+- roll_number
+- department_id
+- batch_id
+- section_id
+- semester_id
+- cgpa
+- admission_year
+
+**`student_profiles`**
+- student_id
+- phone
+- email
+- parent_name
+- parent_phone
+- blood_group
+- address
+- avatar_url
+
+Your frontend explicitly includes register number, department, batch, CGPA, contact information, parent contact and address. :chatgpt-content-reference{index="0"}
+
+---
+
+### 👨‍🏫 Staff / Faculty
+
+```text
+staff
+staff_profiles
+```
+
+**`staff`**
+- id
+- user_id
+- faculty_id
+- department_id
+- designation
+- cabin_number
+
+**`staff_profiles`**
+- staff_id
+- phone
+- email
+- qualifications
+- experience
+- research_areas
+- bio
+- avatar_url
+
+These correspond to the faculty information described in your frontend. :chatgpt-content-reference{index="1"}
+
+---
+
+### 🏛️ Admin / HOD
+
+You don't necessarily need a separate `admins` table.
+
+I'd use:
+
+```text
+users
+    │
+    └── role = ADMIN
+```
+
+and, if the application eventually needs department-specific admin metadata:
+
+```text
+admin_profiles
+```
+
+**`admin_profiles`**
+- user_id
+- department_id
+- permission_level
+- designation
+- contact information
+
+This avoids creating three independent authentication systems.
+
+---
+
+# 📚 Academic structure
+
+These are important for your timetable, attendance and materials.
+
+```text
+courses
+course_offerings
+rooms
+periods
+```
+
+### `courses`
+
+```text
+id
+department_id
+course_code
+course_name
+credits
+course_type
+```
+
+Example:
+
+```text
+AD3501 | Deep Learning
+AD3391 | Database Design
+AD3251 | Data Structure Design
+```
+
+### `course_offerings`
+
+This connects a course to a particular semester/section.
+
+```text
+id
+course_id
+semester_id
+section_id
+staff_id
+```
+
+This is much better than putting `course_id`, `staff_id`, and `section_id` directly into every timetable record.
+
+### `rooms`
+
+```text
+id
+room_number
+room_name
+room_type
+capacity
+```
+
+Examples:
+
+```text
+A-101
+AI LAB 1
+DBMS LAB
+```
+
+### `periods`
+
+```text
+id
+period_number
+start_time
+end_time
+```
+
+For example:
+
+```text
+1 → 09:00 - 09:50
+2 → 09:50 - 10:40
+...
+7 → ...
+```
+
+---
+
+# 📅 Timetable
+
+I'd use:
+
+```text
+timetable_entries
+```
+
+with relationships to the academic entities.
+
+```text
+id
+course_offering_id
+section_id
+staff_id
+room_id
+period_id
+day_of_week
+lecture_type
+academic_year_id
+semester_id
+```
+
+Your frontend needs the timetable to provide **subject code/name, lecture type, classroom/lab, faculty and period status**. :chatgpt-content-reference{index="2"}
+
+This table is therefore one of the central tables in the system.
+
+---
+
+# 📝 Attendance
+
+This needs careful design.
+
+I'd use:
+
+```text
+attendance_sessions
+attendance_records
+```
+
+### `attendance_sessions`
+
+Represents one class/period where attendance is taken.
+
+```text
+id
+timetable_entry_id
+date
+staff_id
+submitted_at
+status
+```
+
+### `attendance_records`
+
+Represents each student's attendance.
+
+```text
+id
+attendance_session_id
+student_id
+status
+marked_at
+```
+
+Status:
+
+```text
+PRESENT
+ABSENT
+ON_DUTY
+```
+
+Your frontend explicitly supports those three states. :chatgpt-content-reference{index="3"}
+
+This design is better than putting everything into one giant attendance table because you can represent:
+
+```text
+September 27
+    ↓
+Period 3
+    ↓
+Deep Learning
+    ↓
+Faculty X
+    ↓
+III AI&DS-A
+    ↓
+Attendance Session
+    ├── Student 001 → PRESENT
+    ├── Student 002 → ABSENT
+    ├── Student 003 → ON_DUTY
+    └── ...
+```
+
+And you can enforce a uniqueness rule such as:
+
+```text
+UNIQUE(attendance_session_id, student_id)
+```
+
+to prevent duplicate records.
+
+---
+
+# 📚 Study Materials
+
+I'd use:
+
+```text
+materials
+material_downloads
+```
+
+### `materials`
+
+```text
+id
+course_id
+staff_id
+title
+description
+unit
+topic
+material_type
+file_name
+file_size
+file_format
+storage_key
+created_at
+updated_at
+is_active
+```
+
+Material types can include:
+
+```text
+LECTURE_NOTE
+QUESTION_BANK
+LAB_MANUAL
+SYLLABUS
+PREVIOUS_YEAR_PAPER
+```
+
+Your frontend explicitly supports filtering by subject and material type and displays file format, file size and uploader information. :chatgpt-content-reference{index="4"}
+
+### `material_downloads`
+
+```text
+id
+material_id
+student_id
+downloaded_at
+```
+
+This allows the staff screen's download-count feature to work. :chatgpt-content-reference{index="5"}
+
+---
+
+# 📢 Announcements
+
+Your dashboard contains announcement cards, so I'd include:
+
+```text
+announcements
+announcement_recipients
+```
+
+### `announcements`
+
+```text
+id
+title
+content
+created_by
+target_type
+created_at
+expires_at
+is_published
+```
+
+### `announcement_recipients`
+
+Depending on how targeted announcements need to be:
+
+```text
+id
+announcement_id
+department_id
+batch_id
+section_id
+```
+
+This lets an admin publish something specifically to:
+
+```text
+III AI & DS - A
+```
+
+instead of every student.
+
+---
+
+# 📊 Internal Marks / Academic Performance
+
+Your student dashboard displays internal test marks, and the admin reports include academic performance. :chatgpt-content-reference{index="6"}
+
+So I'd include:
+
+```text
+assessments
+marks
+```
+
+### `assessments`
+
+```text
+id
+course_id
+section_id
+semester_id
+title
+assessment_type
+max_marks
+assessment_date
+```
+
+Example:
+
+```text
+Internal Test 1
+Internal Test 2
+Model Exam
+Assignment
+```
+
+### `marks`
+
+```text
+id
+assessment_id
+student_id
+marks
+graded_by
+graded_at
+```
+
+---
+
+# 📄 Reports
+
+I **wouldn't create a table for every report type**.
+
+For example, don't create:
+
+```text
+defaulter_reports
+faculty_reports
+performance_reports
+```
+
+The reports can be generated from the underlying data.
+
+For example:
+
+```text
+attendance_records
+       ↓
+Attendance Service
+       ↓
+Defaulters Report
+```
+
+and:
+
+```text
+timetable_entries
+       ↓
+Faculty Workload Service
+       ↓
+Faculty Workload Report
+```
+
+Your frontend specifies reports for low attendance, exam eligibility, faculty workload and academic performance. :chatgpt-content-reference{index="7"}
+
+---
+
+# 🔐 Audit & security
+
+I'd definitely have:
+
+```text
+audit_logs
+refresh_tokens
+```
+
+### `refresh_tokens`
+
+```text
+id
+user_id
+token_hash
+expires_at
+revoked_at
+created_at
+device_info
+```
+
+### `audit_logs`
+
+```text
+id
+user_id
+action
+entity_type
+entity_id
+metadata
+ip_address
+created_at
+```
+
+This is particularly useful for:
+
+```text
+Admin changed timetable
+Staff submitted attendance
+Admin modified student
+Staff deleted material
+```
+
+---
+
+# 🌐 Public Campus Portal
+
+Your Common Campus Portal contains department statistics, curriculum, labs, faculty information, placements and research information. :chatgpt-content-reference{index="8"}
+
+I'd use tables such as:
+
+```text
+department_info
+facilities
+research_publications
+placement_statistics
+curriculum_items
+```
+
+But **don't create these automatically just because they're mentioned**. First inspect the actual frontend mock data and determine whether each item needs to be dynamically managed by the backend.
+
+---
+
+# 🗃️ Overall database
+
+So the **initial proposed schema** would look roughly like:
+
+```text
+AUTH / USERS
+├── users
+├── student_profiles
+├── staff_profiles
+├── admin_profiles
+└── refresh_tokens
+
+ORGANIZATION
+├── departments
+├── academic_years
+├── semesters
+├── batches
+└── sections
+
+ACADEMICS
+├── courses
+├── course_offerings
+├── rooms
+└── periods
+
+TIMETABLE
+└── timetable_entries
+
+ATTENDANCE
+├── attendance_sessions
+└── attendance_records
+
+STUDY MATERIAL
+├── materials
+└── material_downloads
+
+ACADEMIC PERFORMANCE
+├── assessments
+└── marks
+
+COMMUNICATION
+├── announcements
+└── announcement_recipients
+
+SECURITY / AUDIT
+└── audit_logs
+
+PUBLIC CAMPUS
+├── department_info
+├── facilities
+├── curriculum_items
+├── research_publications
+└── placement_statistics
+```
+
+### ⚠️ But don't create all of these blindly
+
+This is the important part.
+
+Your **frontend specification tells us what the application needs**, but it does **not establish the exact final database schema**. For example, it says the student dashboard displays internal marks and announcements, but doesn't specify all the database relationships behind them. :chatgpt-content-reference{index="9"}
+
+So I would tell Antigravity:
+
+> **Inspect the actual frontend source and mock data first. Then create the final ERD and schema. Do not create unnecessary tables just because they appear in this preliminary architecture.**
+
+That will prevent over-engineering.
+
+### My preferred relationship structure
+
+The important chain is:
+
+```text
+Department
+   │
+   ├── Batch
+   │     └── Section
+   │           └── Students
+   │
+   └── Courses
+          │
+          └── Course Offering
+                 │
+                 ├── Faculty
+                 └── Section
+                        │
+                        └── Timetable
+                               │
+                               └── Attendance Session
+                                      │
+                                      └── Attendance Records
+                                             │
+                                             └── Student
+```
+
+That structure gives you a **proper relational PostgreSQL design** instead of a collection of disconnected tables.
+
+And yes—I'd make **the database/ERD the first actual backend deliverable** before letting Antigravity start generating FastAPI routers.
