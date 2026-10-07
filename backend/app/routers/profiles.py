@@ -8,8 +8,12 @@ from app.schemas.common import StandardResponse
 from app.schemas.profile import (
     AdminProfileData,
     AdminProfileUpdate,
+    BulkStudentEnrollRequest,
+    BulkStudentEnrollResponse,
     StaffProfileData,
     StaffProfileUpdate,
+    StudentEnrollRequest,
+    StudentEnrollResponse,
     StudentProfileData,
     StudentProfileUpdate,
 )
@@ -41,3 +45,57 @@ async def update_my_profile(
         data=updated,
         message="Profile updated successfully",
     )
+
+
+@router.get("/cohort-options", response_model=StandardResponse[dict])
+async def get_cohort_options(
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    options = await UserService.get_cohort_options(db=db)
+    return StandardResponse(
+        data=options,
+        message="Cohort configuration options retrieved successfully",
+    )
+
+
+@router.get("/students/template")
+async def download_student_enrollment_template():
+    """Download official Excel (.xlsx) template for bulk student enrollment."""
+    from fastapi.responses import StreamingResponse
+    from app.services.template_service import generate_student_enrollment_template
+
+    excel_stream = generate_student_enrollment_template()
+    return StreamingResponse(
+        excel_stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": "attachment; filename=nexus_student_enrollment_template.xlsx",
+            "Access-Control-Expose-Headers": "Content-Disposition",
+        },
+    )
+
+
+@router.post("/students", response_model=StandardResponse[StudentEnrollResponse])
+async def enroll_student(
+    payload: StudentEnrollRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    result = await UserService.enroll_student(db=db, payload=payload)
+    return StandardResponse(
+        data=result,
+        message="Student enrolled successfully",
+    )
+
+
+@router.post("/students/bulk", response_model=StandardResponse[BulkStudentEnrollResponse])
+async def bulk_enroll_students(
+    payload: BulkStudentEnrollRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    result = await UserService.bulk_enroll_students(db=db, payload=payload)
+    return StandardResponse(
+        data=result,
+        message="Bulk student import processed successfully",
+    )
+
+

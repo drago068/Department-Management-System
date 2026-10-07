@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 class DefaulterStudentItem(BaseModel):
     student_id: str
-    roll_number: str
+    register_number: str
     full_name: str
     section_name: str
     attended_hours: int

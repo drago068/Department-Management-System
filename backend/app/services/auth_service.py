@@ -27,7 +27,6 @@ class AuthService:
             .where(
                 or_(
                     func.lower(User.identifier) == ident,
-                    func.lower(Student.roll_number) == ident,
                     func.lower(Student.register_number) == ident,
                     func.lower(Student.email) == ident,
                     func.lower(Staff.faculty_id) == ident,

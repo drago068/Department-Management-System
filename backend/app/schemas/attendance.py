@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 class StudentRosterItem(BaseModel):
     id: str
-    roll_number: str
+    register_number: str
     name: str
     default_status: str = "PRESENT"
 

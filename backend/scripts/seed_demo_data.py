@@ -310,19 +310,19 @@ async def seed():
 
         print("[STUDENTS] Seeding Students...")
         students_roster = [
-            ("CS2024-001", "714022AD001", "Arjun Patel", "arjun.p@suguna.edu", 8.75, "O+", "+91 9876543210", "+91 9876500000", "Rajesh Patel", "142, North Street, Coimbatore"),
-            ("CS2024-002", "714022AD002", "Priya Sharma", "priya.s@suguna.edu", 9.10, "A+", "+91 9876543211", "+91 9876500001", "Sanjay Sharma", "54, Gandhi Nagar, Coimbatore"),
-            ("CS2024-003", "714022AD003", "Rahul V", "rahul.v@suguna.edu", 7.20, "B+", "+91 9876543212", "+91 9876500002", "Vijay Kumar", "12, Crosscut Road, Coimbatore"),
-            ("CS2024-004", "714022AD004", "Sneha K", "sneha.k@suguna.edu", 8.40, "AB+", "+91 9876543213", "+91 9876500003", "Krishnan S", "88, R.S. Puram, Coimbatore"),
-            ("CS2024-005", "714022AD005", "Dinesh M", "dinesh.m@suguna.edu", 6.95, "O-", "+91 9876543214", "+91 9876500004", "Murugan K", "102, Peelamedu, Coimbatore"),
-            ("CS2024-006", "714022AD006", "Ananya R", "ananya.r@suguna.edu", 8.90, "A-", "+91 9876543215", "+91 9876500005", "Ramanathan G", "23, Saibaba Colony, Coimbatore"),
-            ("CS2024-007", "714022AD007", "Karthik B", "karthik.b@suguna.edu", 7.65, "B-", "+91 9876543216", "+91 9876500006", "Balaji T", "71, Race Course, Coimbatore"),
-            ("CS2024-008", "714022AD008", "Meera N", "meera.n@suguna.edu", 9.35, "O+", "+91 9876543217", "+91 9876500007", "Narayanan S", "9, Avinashi Road, Coimbatore"),
+            ("714022AD001", "Arjun Patel", "arjun.p@suguna.edu", 8.75, "O+", "+91 9876543210", "+91 9876500000", "Rajesh Patel", "142, North Street, Coimbatore"),
+            ("714022AD002", "Priya Sharma", "priya.s@suguna.edu", 9.10, "A+", "+91 9876543211", "+91 9876500001", "Sanjay Sharma", "54, Gandhi Nagar, Coimbatore"),
+            ("714022AD003", "Rahul V", "rahul.v@suguna.edu", 7.20, "B+", "+91 9876543212", "+91 9876500002", "Vijay Kumar", "12, Crosscut Road, Coimbatore"),
+            ("714022AD004", "Sneha K", "sneha.k@suguna.edu", 8.40, "AB+", "+91 9876543213", "+91 9876500003", "Krishnan S", "88, R.S. Puram, Coimbatore"),
+            ("714022AD005", "Dinesh M", "dinesh.m@suguna.edu", 6.95, "O-", "+91 9876543214", "+91 9876500004", "Murugan K", "102, Peelamedu, Coimbatore"),
+            ("714022AD006", "Ananya R", "ananya.r@suguna.edu", 8.90, "A-", "+91 9876543215", "+91 9876500005", "Ramanathan G", "23, Saibaba Colony, Coimbatore"),
+            ("714022AD007", "Karthik B", "karthik.b@suguna.edu", 7.65, "B-", "+91 9876543216", "+91 9876500006", "Balaji T", "71, Race Course, Coimbatore"),
+            ("714022AD008", "Meera N", "meera.n@suguna.edu", 9.35, "O+", "+91 9876543217", "+91 9876500007", "Narayanan S", "9, Avinashi Road, Coimbatore"),
         ]
 
         student_objs = []
-        for roll, reg, name, email, cgpa, bg, ph, pph, pname, addr in students_roster:
-            u = User(identifier=roll, password_hash=default_pwd, role="STUDENT")
+        for reg, name, email, cgpa, bg, ph, pph, pname, addr in students_roster:
+            u = User(identifier=reg, password_hash=default_pwd, role="STUDENT")
             db.add(u)
             await db.flush()
             st = Student(
@@ -332,7 +332,6 @@ async def seed():
                 batch_id=batch_22_26.id,
                 section_id=sec_a.id,
                 faculty_mentor_id=stf_kumar.id,
-                roll_number=roll,
                 register_number=reg,
                 full_name=name,
                 email=email,
@@ -342,7 +341,7 @@ async def seed():
                 date_of_birth=date(2004, 5, 14),
                 blood_group=bg,
                 address=addr,
-                avatar_url=f"https://api.dicebear.com/7.x/avataaars/svg?seed={roll}",
+                avatar_url=f"https://api.dicebear.com/7.x/avataaars/svg?seed={reg}",
                 cgpa=cgpa,
                 is_active=True,
             )
@@ -580,7 +579,7 @@ async def seed():
         await db.commit()
         print("[SUCCESS] Demo Data Seeding Completed Successfully!")
         print("\n[CREDENTIALS] Demo Credentials:")
-        print("   * Student : Identifier: CS2024-001    | Password: Password123!")
+        print("   * Student : Identifier: 714022AD001   | Password: Password123!")
         print("   * Faculty : Identifier: FAC-2024-001  | Password: Password123!")
         print("   * Admin   : Identifier: admin         | Password: AdminPassword123!")
 

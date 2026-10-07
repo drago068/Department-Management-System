@@ -28,6 +28,7 @@ import StaffNotes from './screens/StaffNotes';
 import StudentTimetable from './screens/StudentTimetable';
 import StaffTimetable from './screens/StaffTimetable';
 import AdminTimetable from './screens/AdminTimetable';
+import EnrollStudent from './screens/EnrollStudent';
 
 const Stack = createNativeStackNavigator();
 
@@ -75,6 +76,7 @@ export default function App() {
           <Stack.Screen name="StudentTimetable" component={StudentTimetable} />
           <Stack.Screen name="StudyMaterials" component={StudyMaterials} />
           <Stack.Screen name="ReportManagement" component={ReportManagement} />
+          <Stack.Screen name="EnrollStudent" component={EnrollStudent} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

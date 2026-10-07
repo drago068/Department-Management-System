@@ -47,7 +47,7 @@ class ReportService:
                 defaulters.append(
                     DefaulterStudentItem(
                         student_id=str(s.id),
-                        roll_number=s.roll_number,
+                        register_number=s.register_number,
                         full_name=s.full_name,
                         section_name=f"Sec {s.section.name}",
                         attended_hours=attended,

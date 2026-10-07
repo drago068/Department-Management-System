@@ -69,14 +69,14 @@ class AttendanceService:
         students_stmt = (
             select(Student)
             .where(Student.section_id == entry.section_id, Student.is_active == True)
-            .order_by(Student.roll_number)
+            .order_by(Student.register_number)
         )
         students = (await db.execute(students_stmt)).scalars().all()
 
         roster_items = [
             StudentRosterItem(
                 id=str(s.id),
-                roll_number=s.roll_number,
+                register_number=s.register_number,
                 name=s.full_name,
                 default_status="PRESENT",
             )

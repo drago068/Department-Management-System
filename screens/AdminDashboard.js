@@ -153,8 +153,9 @@ const AdminDashboard = ({ navigation }) => {
                   style={styles.quickActionItem}
                   activeOpacity={0.7}
                   onPress={() => {
-                    if (action.label === 'Generate Reports') navigation?.navigate('ReportManagement');
-                    else if (action.label === 'Assign Subjects' || action.label === 'Add Student') navigation?.navigate('ReportManagement');
+                    if (action.label === 'Add Student') navigation?.navigate('EnrollStudent');
+                    else if (action.label === 'Generate Reports') navigation?.navigate('ReportManagement');
+                    else if (action.label === 'Assign Subjects') navigation?.navigate('ReportManagement');
                   }}
                 >
                   <MaterialIcons name={action.icon} size={24} color={action.color} />

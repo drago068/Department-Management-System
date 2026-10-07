@@ -24,6 +24,7 @@ pyjwt[crypto]>=2.9.0
 # ── File Handling & Utilities ─────────────────────────────────────────────────
 python-multipart>=0.0.9
 aiofiles>=24.1.0
+openpyxl>=3.1.5
 
 # ── Supabase SDK (optional — for Storage / Edge Functions / Realtime) ─────────
 # supabase>=2.7.0           # Uncomment if using Supabase Storage or Realtime

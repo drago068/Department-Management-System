@@ -16,7 +16,6 @@ class Student(Base):
     section_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("sections.id"), nullable=False, index=True)
     faculty_mentor_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid, ForeignKey("staff.id", ondelete="SET NULL"), nullable=True)
 
-    roll_number: Mapped[str] = mapped_column(String(32), unique=True, nullable=False, index=True)
     register_number: Mapped[str] = mapped_column(String(32), unique=True, nullable=False, index=True)
     full_name: Mapped[str] = mapped_column(String(128), nullable=False)
     email: Mapped[str] = mapped_column(String(128), nullable=False)

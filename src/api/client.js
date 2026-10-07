@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 // Change to your machine's LAN IP when testing on a physical device
-const BASE_URL = 'http://127.0.0.1:8000/api/v1';
+export const BASE_URL = 'http://127.0.0.1:8000/api/v1';
 
 const STORAGE_KEYS = {
   ACCESS_TOKEN: '@cms_access_token',
@@ -179,5 +179,3 @@ export const api = {
   delete: (path) =>
     apiRequest(path, { method: 'DELETE' }),
 };
-
-export { BASE_URL };
