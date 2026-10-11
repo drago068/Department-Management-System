@@ -53,8 +53,11 @@ class SubjectAttendanceItem(BaseModel):
     attended_hours: int
     total_hours: int
     percentage: float
-    status: str  # EXCELLENT, GOOD, CRITICAL
+    status: str  # EXCELLENT, GOOD, CRITICAL, NOT_STARTED
     max_absences_allowed: int
+    credits: Optional[str] = "3 Credits"
+    absent_hours: Optional[int] = 0
+    od_hours: Optional[int] = 0
 
 
 class StudentAttendanceSummaryResponse(BaseModel):
@@ -63,6 +66,8 @@ class StudentAttendanceSummaryResponse(BaseModel):
     total_conducted_hours: int
     benchmark_percentage: float = 75.0
     status: str  # SAFE, WARNING, CRITICAL
+    od_hours: Optional[int] = 0
+    absent_hours: Optional[int] = 0
     subjects: List[SubjectAttendanceItem]
 
 
@@ -77,3 +82,5 @@ class AttendanceHistoryItem(BaseModel):
     total_count: int
     staff_name: str
     section_name: str
+    status: Optional[str] = None  # PRESENT, ABSENT, ON_DUTY (when viewed by student)
+    topic_covered: Optional[str] = None

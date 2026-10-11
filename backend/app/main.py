@@ -10,17 +10,7 @@ from app.core.database import engine
 from app.core.exceptions import register_exception_handlers
 from app.models.base import Base
 import app.models  # Ensure all models are registered in metadata
-from app.routers import (
-    academic_router,
-    announcements_router,
-    attendance_router,
-    auth_router,
-    materials_router,
-    profiles_router,
-    public_router,
-    reports_router,
-    timetable_router,
-)
+from app.api.router import api_router
 
 
 @asynccontextmanager
@@ -96,14 +86,6 @@ async def root():
     }
 
 
-# Include Routers with API Prefix
-api_prefix = settings.API_V1_STR
-app.include_router(auth_router, prefix=api_prefix)
-app.include_router(profiles_router, prefix=api_prefix)
-app.include_router(academic_router, prefix=api_prefix)
-app.include_router(timetable_router, prefix=api_prefix)
-app.include_router(attendance_router, prefix=api_prefix)
-app.include_router(materials_router, prefix=api_prefix)
-app.include_router(announcements_router, prefix=api_prefix)
-app.include_router(reports_router, prefix=api_prefix)
-app.include_router(public_router, prefix=api_prefix)
+# Include Central API Router with API Prefix
+app.include_router(api_router, prefix=settings.API_V1_STR)
+

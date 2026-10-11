@@ -81,8 +81,6 @@ I would actually keep most identity information in `users` and academic informat
 - student_id
 - phone
 - email
-- parent_name
-- parent_phone
 - blood_group
 - address
 - avatar_url

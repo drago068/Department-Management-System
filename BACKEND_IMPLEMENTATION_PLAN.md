@@ -322,11 +322,11 @@ graph TD
 
 * **Tasks**:
   1. Implement `UserService.get_profile()`:
-     * Student: Returns enrollment info, semester, batch, CGPA, mentor details, and parent contact.
+     * Student: Returns enrollment info, semester, batch, CGPA, and mentor details.
      * Staff: Returns cabin number, qualifications, designation, and experience.
      * Admin: Returns office location and departmental governance metadata.
   2. Implement `UserService.update_student_profile()`:
-     * Permitted self-service edits: `phone`, `email`, `address`, `parent_phone`, `blood_group`, `avatar_url`.
+     * Permitted self-service edits: `phone`, `email`, `address`, `blood_group`, `avatar_url`.
      * **Strictly Blocked / Immutable**: `id`, `user_id`, `register_number`, `department_id`, `batch_id`, `section_id`, `semester`, `cgpa`.
 * **Definition of Done**:
   * Editing phone number or email updates profile successfully.

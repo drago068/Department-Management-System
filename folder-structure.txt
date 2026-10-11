@@ -1,0 +1,367 @@
+CMS-REACT-NATIVE/
+├── .gitignore
+├── API_SPECIFICATION.md
+├── AUTHORIZATION_MATRIX.md
+├── App.js
+├── BACKEND_IMPLEMENTATION_PLAN.md
+├── DATABASE_DESIGN.md
+├── LICENSE
+├── README.md
+├── alembic.ini
+├── app.json
+├── assets
+│   ├── android-icon-background.png
+│   ├── android-icon-foreground.png
+│   ├── android-icon-monochrome.png
+│   ├── favicon.png
+│   ├── icon.png
+│   ├── splash-icon.png
+│   └── time table 3 yr.jpeg
+├── backend
+│   ├── .env
+│   ├── .env.example
+│   ├── README.md
+│   ├── alembic
+│   │   ├── README
+│   │   ├── env.py
+│   │   ├── script.py.mako
+│   │   └── versions
+│   │       ├── 6861910dfa99_create_all_cms_tables.py
+│   │       ├── 7583eb2df4d8_initial_schema_all_22_tables.py
+│   │       ├── b3f3b03f4223_remove_roll_number_from_students.py
+│   │       └── c5e82a1df001_remove_parent_name_and_phone.py
+│   ├── alembic.ini
+│   ├── app
+│   │   ├── api
+│   │   │   ├── __init__.py
+│   │   │   ├── dependencies.py
+│   │   │   └── router.py
+│   │   ├── common
+│   │   │   ├── __init__.py
+│   │   │   ├── pagination.py
+│   │   │   └── responses.py
+│   │   ├── core
+│   │   │   ├── config.py
+│   │   │   ├── database.py
+│   │   │   ├── dependencies.py
+│   │   │   ├── exceptions.py
+│   │   │   ├── permissions.py
+│   │   │   └── security.py
+│   │   ├── database
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   ├── init_db.py
+│   │   │   └── session.py
+│   │   ├── main.py
+│   │   ├── models
+│   │   │   ├── __init__.py
+│   │   │   ├── academics.py
+│   │   │   ├── announcements.py
+│   │   │   ├── attendance.py
+│   │   │   ├── audit.py
+│   │   │   ├── base.py
+│   │   │   ├── materials.py
+│   │   │   ├── organization.py
+│   │   │   ├── profiles.py
+│   │   │   ├── timetable.py
+│   │   │   └── user.py
+│   │   ├── modules
+│   │   │   ├── announcements
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── models.py
+│   │   │   │   ├── repository.py
+│   │   │   │   ├── router.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── service.py
+│   │   │   ├── assignments
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── repository.py
+│   │   │   │   ├── router.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── service.py
+│   │   │   ├── attendance
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── models.py
+│   │   │   │   ├── repository.py
+│   │   │   │   ├── router.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── service.py
+│   │   │   ├── auth
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── models.py
+│   │   │   │   ├── repository.py
+│   │   │   │   ├── router.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── service.py
+│   │   │   ├── departments
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── models.py
+│   │   │   │   ├── repository.py
+│   │   │   │   ├── router.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── service.py
+│   │   │   ├── faculty
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── models.py
+│   │   │   │   ├── repository.py
+│   │   │   │   ├── router.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── service.py
+│   │   │   ├── marks
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── repository.py
+│   │   │   │   ├── router.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── service.py
+│   │   │   ├── materials
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── models.py
+│   │   │   │   ├── repository.py
+│   │   │   │   ├── router.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── service.py
+│   │   │   ├── public
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── router.py
+│   │   │   ├── reports
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── repository.py
+│   │   │   │   ├── router.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── service.py
+│   │   │   ├── students
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── models.py
+│   │   │   │   ├── repository.py
+│   │   │   │   ├── router.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── service.py
+│   │   │   ├── subjects
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── models.py
+│   │   │   │   ├── repository.py
+│   │   │   │   ├── router.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── service.py
+│   │   │   ├── timetable
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── models.py
+│   │   │   │   ├── repository.py
+│   │   │   │   ├── router.py
+│   │   │   │   ├── schemas.py
+│   │   │   │   └── service.py
+│   │   │   └── users
+│   │   │       ├── __init__.py
+│   │   │       ├── models.py
+│   │   │       ├── repository.py
+│   │   │       ├── router.py
+│   │   │       ├── schemas.py
+│   │   │       └── service.py
+│   │   ├── routers
+│   │   │   ├── __init__.py
+│   │   │   ├── academic.py
+│   │   │   ├── announcements.py
+│   │   │   ├── attendance.py
+│   │   │   ├── auth.py
+│   │   │   ├── materials.py
+│   │   │   ├── profiles.py
+│   │   │   ├── public.py
+│   │   │   ├── reports.py
+│   │   │   └── timetable.py
+│   │   ├── schemas
+│   │   │   ├── __init__.py
+│   │   │   ├── academic.py
+│   │   │   ├── announcements.py
+│   │   │   ├── attendance.py
+│   │   │   ├── auth.py
+│   │   │   ├── common.py
+│   │   │   ├── materials.py
+│   │   │   ├── profile.py
+│   │   │   ├── reports.py
+│   │   │   └── timetable.py
+│   │   └── services
+│   │       ├── academic_service.py
+│   │       ├── announcement_service.py
+│   │       ├── attendance_service.py
+│   │       ├── audit_service.py
+│   │       ├── auth_service.py
+│   │       ├── material_service.py
+│   │       ├── report_service.py
+│   │       ├── template_service.py
+│   │       ├── timetable_service.py
+│   │       └── user_service.py
+│   ├── cms.db
+│   ├── requirements.txt
+│   ├── scripts
+│   │   ├── add_demo_student_21ad001.py
+│   │   ├── inspect_students.py
+│   │   └── seed_demo_data.py
+│   ├── tests
+│   │   ├── conftest.py
+│   │   ├── test_attendance.py
+│   │   ├── test_auth.py
+│   │   ├── test_rbac.py
+│   │   └── test_timetable.py
+│   └── uploads
+│       └── demo_notes.pdf
+├── cms.db
+├── database design.txt
+├── docs
+│   ├── API_SPECIFICATION.md
+│   ├── AUTHORIZATION_MATRIX.md
+│   ├── BACKEND_IMPLEMENTATION_PLAN.md
+│   ├── DATABASE_DESIGN.md
+│   ├── ROLE_BASED_ARCHITECTURE.md
+│   ├── database design.txt
+│   ├── folder-structure.txt
+│   └── frontend.md
+├── folder-structure.txt
+├── frontend
+│   ├── App.js
+│   ├── app.json
+│   ├── assets
+│   │   ├── android-icon-background.png
+│   │   ├── android-icon-foreground.png
+│   │   ├── android-icon-monochrome.png
+│   │   ├── favicon.png
+│   │   ├── icon.png
+│   │   ├── splash-icon.png
+│   │   └── time table 3 yr.jpeg
+│   ├── index.js
+│   ├── package-lock.json
+│   ├── package.json
+│   └── src
+│       ├── app
+│       │   ├── index.js
+│       │   ├── navigation
+│       │   │   ├── AppNavigator.js
+│       │   │   └── index.js
+│       │   └── providers
+│       │       ├── AppProviders.js
+│       │       └── index.js
+│       ├── components
+│       │   ├── common
+│       │   │   ├── BottomNavBar.js
+│       │   │   ├── NavigationDrawer.js
+│       │   │   ├── StudentBottomNav.js
+│       │   │   ├── TopAppBar.js
+│       │   │   └── index.js
+│       │   ├── forms
+│       │   │   └── index.js
+│       │   ├── index.js
+│       │   └── layout
+│       │       └── index.js
+│       ├── constants
+│       │   ├── colors.js
+│       │   ├── index.js
+│       │   └── typography.js
+│       ├── context
+│       │   ├── AuthContext.js
+│       │   └── index.js
+│       ├── hooks
+│       │   └── index.js
+│       ├── index.js
+│       ├── modules
+│       │   ├── admin
+│       │   │   ├── assignments
+│       │   │   │   └── index.js
+│       │   │   ├── attendance
+│       │   │   │   ├── ReportManagement.js
+│       │   │   │   └── index.js
+│       │   │   ├── dashboard
+│       │   │   │   └── AdminDashboard.js
+│       │   │   ├── departments
+│       │   │   │   └── index.js
+│       │   │   ├── faculty
+│       │   │   │   ├── AdminStaffOnboardingScreen.js
+│       │   │   │   └── MentorProctorAllocationScreen.js
+│       │   │   ├── index.js
+│       │   │   ├── marks
+│       │   │   │   └── index.js
+│       │   │   ├── profile
+│       │   │   │   ├── AdminEditProfile.js
+│       │   │   │   └── AdminProfile.js
+│       │   │   ├── reports
+│       │   │   │   ├── ReportManagement.js
+│       │   │   │   └── index.js
+│       │   │   ├── students
+│       │   │   │   ├── EnrollStudent.js
+│       │   │   │   └── EnrollmentSuccess.js
+│       │   │   ├── subjects
+│       │   │   │   └── index.js
+│       │   │   └── timetable
+│       │   │       └── AdminTimetable.js
+│       │   ├── auth
+│       │   │   ├── context
+│       │   │   │   ├── AuthContext.js
+│       │   │   │   └── index.js
+│       │   │   ├── index.js
+│       │   │   └── screens
+│       │   │       ├── AdminLogin.js
+│       │   │       ├── CommonPortal.js
+│       │   │       ├── LoginPage.js
+│       │   │       ├── StaffLogin.js
+│       │   │       └── StudentLogin.js
+│       │   ├── index.js
+│       │   ├── staff
+│       │   │   ├── attendance
+│       │   │   │   ├── AttendanceReview.js
+│       │   │   │   └── MarkAttendance.js
+│       │   │   ├── dashboard
+│       │   │   │   └── StaffDashboard.js
+│       │   │   ├── index.js
+│       │   │   ├── materials
+│       │   │   │   └── StaffNotes.js
+│       │   │   ├── mentor-proctor
+│       │   │   │   └── MentorProctorAllocationScreen.js
+│       │   │   ├── profile
+│       │   │   │   ├── StaffEditProfile.js
+│       │   │   │   └── StaffProfile.js
+│       │   │   ├── students
+│       │   │   │   └── index.js
+│       │   │   └── timetable
+│       │   │       └── StaffTimetable.js
+│       │   └── student
+│       │       ├── attendance
+│       │       │   ├── AttendanceHistory.js
+│       │       │   └── StudentAttendanceDetail.js
+│       │       ├── dashboard
+│       │       │   └── StudentDashboard.js
+│       │       ├── enrollment
+│       │       │   └── index.js
+│       │       ├── index.js
+│       │       ├── materials
+│       │       │   └── StudyMaterials.js
+│       │       ├── profile
+│       │       │   ├── StudentEditProfile.js
+│       │       │   └── StudentProfile.js
+│       │       └── timetable
+│       │           └── StudentTimetable.js
+│       ├── services
+│       │   ├── api
+│       │   │   ├── announcements.js
+│       │   │   ├── attendance.js
+│       │   │   ├── auth.js
+│       │   │   ├── client.js
+│       │   │   ├── index.js
+│       │   │   ├── materials.js
+│       │   │   ├── profiles.js
+│       │   │   └── timetable.js
+│       │   └── index.js
+│       ├── theme
+│       │   ├── colors.js
+│       │   ├── index.js
+│       │   └── typography.js
+│       ├── types
+│       │   └── index.js
+│       └── utils
+│           └── index.js
+├── frontend.md
+├── index.js
+├── package-lock.json
+├── package.json
+├── tests
+│   ├── README.md
+│   └── test_smoke.py
+└── uploads
+    └── demo_notes.pdf

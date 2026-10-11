@@ -69,7 +69,7 @@ async def get_student_attendance_summary(
 @router.get("/history", response_model=StandardResponse[List[AttendanceHistoryItem]])
 async def get_attendance_history(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(require_role(["ADMIN"]))],
+    current_user: Annotated[User, Depends(require_role(["ADMIN", "STAFF", "STUDENT"]))],
     history_date: Optional[date] = Query(None, alias="date"),
     limit: int = Query(50, ge=1, le=100),
 ):
@@ -77,5 +77,6 @@ async def get_attendance_history(
         db=db,
         date_filter=history_date,
         limit=limit,
+        current_user=current_user,
     )
     return StandardResponse(data=history, message="Attendance history retrieved")

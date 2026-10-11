@@ -1,7 +1,17 @@
 {
-  "name": "reactnativeapp",
+  "name": "cms-college-management-system",
   "version": "1.0.0",
   "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "frontend:start": "npm --prefix frontend start",
+    "frontend:android": "npm --prefix frontend run android",
+    "frontend:ios": "npm --prefix frontend run ios",
+    "frontend:web": "npm --prefix frontend run web"
+  },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "^3.1.1",
@@ -18,12 +28,6 @@
     "react-native-screens": "^4.27.0",
     "react-native-svg": "^15.15.5",
     "react-native-web": "^0.21.2"
-  },
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
   },
   "private": true
 }

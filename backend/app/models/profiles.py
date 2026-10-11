@@ -20,8 +20,6 @@ class Student(Base):
     full_name: Mapped[str] = mapped_column(String(128), nullable=False)
     email: Mapped[str] = mapped_column(String(128), nullable=False)
     phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
-    parent_name: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
-    parent_phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     date_of_birth: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     blood_group: Mapped[Optional[str]] = mapped_column(String(8), nullable=True)
     address: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

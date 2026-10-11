@@ -336,8 +336,6 @@ async def seed():
                 full_name=name,
                 email=email,
                 phone=ph,
-                parent_name=pname,
-                parent_phone=pph,
                 date_of_birth=date(2004, 5, 14),
                 blood_group=bg,
                 address=addr,

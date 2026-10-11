@@ -129,8 +129,6 @@ All backend endpoints are prefixed with `/api/v1/`.
     "cgpa": 8.75,
     "phone": "+91 9876543210",
     "email": "arjun.p@suguna.edu",
-    "parent_name": "Rajesh Patel",
-    "parent_phone": "+91 9876500000",
     "blood_group": "O+",
     "address": "142, North Street, Coimbatore",
     "avatar_url": "https://..."

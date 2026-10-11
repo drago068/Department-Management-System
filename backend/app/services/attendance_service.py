@@ -217,13 +217,16 @@ class AttendanceService:
         target_student_id: Optional[str] = None,
     ) -> StudentAttendanceSummaryResponse:
         student_uuid = None
+        student_obj = None
         if current_user.role == "STUDENT":
             s = (await db.execute(select(Student).where(Student.user_id == current_user.id))).scalar_one_or_none()
             if not s:
                 raise NotFoundException("Student profile not found")
             student_uuid = s.id
+            student_obj = s
         elif target_student_id:
             student_uuid = uuid.UUID(target_student_id)
+            student_obj = (await db.execute(select(Student).where(Student.id == student_uuid))).scalar_one_or_none()
         else:
             raise ForbiddenException("Target student ID must be provided")
 
@@ -243,10 +246,38 @@ class AttendanceService:
 
         total_conducted = len(records)
         total_attended = sum(1 for r in records if r.status in ["PRESENT", "ON_DUTY"])
+        od_hours = sum(1 for r in records if r.status == "ON_DUTY")
+        absent_hours = sum(1 for r in records if r.status == "ABSENT")
         overall_pct = round((total_attended / total_conducted * 100), 1) if total_conducted > 0 else 100.0
 
         # Group by course
         courses_map = {}
+
+        # Pre-populate all courses scheduled for the student's section from timetable
+        if student_obj and student_obj.section_id:
+            tt_stmt = (
+                select(TimetableEntry)
+                .options(
+                    selectinload(TimetableEntry.course),
+                    selectinload(TimetableEntry.staff),
+                )
+                .where(TimetableEntry.section_id == student_obj.section_id)
+            )
+            tt_entries = (await db.execute(tt_stmt)).scalars().all()
+            for entry in tt_entries:
+                c = entry.course
+                if c and c.id not in courses_map:
+                    courses_map[c.id] = {
+                        "code": c.code,
+                        "name": c.name,
+                        "staff_name": entry.staff.full_name if entry.staff else "Faculty",
+                        "attended": 0,
+                        "total": 0,
+                        "absent": 0,
+                        "od": 0,
+                        "credits": f"{c.credits} Credits" if hasattr(c, "credits") else "3 Credits",
+                    }
+
         for r in records:
             course = r.session.timetable_entry.course
             staff = r.session.staff
@@ -257,19 +288,29 @@ class AttendanceService:
                     "staff_name": staff.full_name if staff else "Faculty",
                     "attended": 0,
                     "total": 0,
+                    "absent": 0,
+                    "od": 0,
+                    "credits": f"{course.credits} Credits" if hasattr(course, "credits") else "3 Credits",
                 }
             courses_map[course.id]["total"] += 1
             if r.status in ["PRESENT", "ON_DUTY"]:
                 courses_map[course.id]["attended"] += 1
+            if r.status == "ABSENT":
+                courses_map[course.id]["absent"] += 1
+            elif r.status == "ON_DUTY":
+                courses_map[course.id]["od"] += 1
 
         subject_items: List[SubjectAttendanceItem] = []
         for c in courses_map.values():
-            pct = round((c["attended"] / c["total"] * 100), 1) if c["total"] > 0 else 100.0
-            status_label = "EXCELLENT" if pct >= 90.0 else ("GOOD" if pct >= 75.0 else "CRITICAL")
-
-            # Max absences allowed formula: floor( (attended - 0.75 * total) / 0.75 )
-            excess = c["attended"] - 0.75 * c["total"]
-            max_absences = max(0, math.floor(excess / 0.75)) if excess > 0 else 0
+            if c["total"] > 0:
+                pct = round((c["attended"] / c["total"] * 100), 1)
+                status_label = "EXCELLENT" if pct >= 90.0 else ("GOOD" if pct >= 75.0 else "CRITICAL")
+                excess = c["attended"] - 0.75 * c["total"]
+                max_absences = max(0, math.floor(excess / 0.75)) if excess > 0 else 0
+            else:
+                pct = 100.0
+                status_label = "SAFE"
+                max_absences = 0
 
             subject_items.append(
                 SubjectAttendanceItem(
@@ -281,6 +322,9 @@ class AttendanceService:
                     percentage=pct,
                     status=status_label,
                     max_absences_allowed=max_absences,
+                    credits=c.get("credits", "3 Credits"),
+                    absent_hours=c.get("absent", 0),
+                    od_hours=c.get("od", 0),
                 )
             )
 
@@ -292,6 +336,8 @@ class AttendanceService:
             total_conducted_hours=total_conducted,
             benchmark_percentage=75.0,
             status=overall_status,
+            od_hours=od_hours,
+            absent_hours=absent_hours,
             subjects=subject_items,
         )
 
@@ -300,6 +346,7 @@ class AttendanceService:
         db: AsyncSession,
         date_filter: Optional[date] = None,
         limit: int = 50,
+        current_user: Optional[User] = None,
     ) -> List[AttendanceHistoryItem]:
         stmt = (
             select(AttendanceSession)
@@ -309,15 +356,42 @@ class AttendanceService:
                 selectinload(AttendanceSession.timetable_entry).selectinload(TimetableEntry.period),
                 selectinload(AttendanceSession.staff),
             )
-            .order_by(AttendanceSession.date.desc(), AttendanceSession.submitted_at.desc())
-            .limit(limit)
         )
+
+        stud_obj = None
+        if current_user and current_user.role == "STAFF":
+            staff_res = await db.execute(select(Staff).where(Staff.user_id == current_user.id))
+            staff_obj = staff_res.scalar_one_or_none()
+            if staff_obj:
+                stmt = stmt.where(AttendanceSession.staff_id == staff_obj.id)
+        elif current_user and current_user.role == "STUDENT":
+            stud_res = await db.execute(select(Student).where(Student.user_id == current_user.id))
+            stud_obj = stud_res.scalar_one_or_none()
+            if stud_obj and stud_obj.section_id:
+                stmt = stmt.join(AttendanceSession.timetable_entry).where(TimetableEntry.section_id == stud_obj.section_id)
+
         if date_filter:
             stmt = stmt.where(AttendanceSession.date == date_filter)
 
+        stmt = stmt.order_by(AttendanceSession.date.desc(), AttendanceSession.submitted_at.desc()).limit(limit)
         sessions = (await db.execute(stmt)).scalars().all()
+
+        # Map student's individual attendance status for each session
+        student_records_map = {}
+        if current_user and current_user.role == "STUDENT" and stud_obj:
+            session_ids = [s.id for s in sessions]
+            if session_ids:
+                rec_stmt = select(AttendanceRecord).where(
+                    AttendanceRecord.student_id == stud_obj.id,
+                    AttendanceRecord.attendance_session_id.in_(session_ids),
+                )
+                recs = (await db.execute(rec_stmt)).scalars().all()
+                for r in recs:
+                    student_records_map[r.attendance_session_id] = r.status
+
         history_items: List[AttendanceHistoryItem] = []
         for s in sessions:
+            student_status = student_records_map.get(s.id)
             history_items.append(
                 AttendanceHistoryItem(
                     id=str(s.id),
@@ -330,6 +404,8 @@ class AttendanceService:
                     total_count=s.total_marked,
                     staff_name=s.staff.full_name,
                     section_name=f"Sec {s.timetable_entry.section.name}",
+                    status=student_status,
+                    topic_covered=s.topic_covered,
                 )
             )
         return history_items

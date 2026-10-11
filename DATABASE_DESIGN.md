@@ -9,7 +9,7 @@ Every table and field below has been cross-checked against the actual React Nati
 | Screen | File | Key Data Verified |
 | :--- | :--- | :--- |
 | Student Profile | `StudentProfile.js` | `full_name`, `register_number`, `department`, `batch`, `semester`, `email`, `phone`, `avatar_url`, `faculty_mentor` (mapped to `staff`), `dob`, `blood_group` ✅ |
-| Student Edit Profile | `StudentEditProfile.js` | Editable: `full_name`, `email`, `phone`, `parent_phone`, `dob`, `blood_group`, `address`. Locked: `register_number`, `department`, `batch`, `semester`, `cgpa` ✅ |
+| Student Edit Profile | `StudentEditProfile.js` | Editable: `full_name`, `email`, `phone`, `dob`, `blood_group`, `address`. Locked: `register_number`, `department`, `batch`, `semester`, `cgpa` ✅ |
 | Student Dashboard | `StudentDashboard.js` | Academic year badge (`AY 2024-2025 • ODD SEM`), department, college name, active student status ✅ |
 | Student Attendance | `StudentAttendanceDetail.js` | Subject `code`, `name`, `credits`, `staff` name, `percentage`, `hours` attended/total, status label ✅ |
 | Student Timetable | `StudentTimetable.js` | Period (`P1`–`P7`), `start_time`, `end_time`, course `code`/`name`, `lecture_type`, `room`, faculty name, break entries, status (`Done`/`NOW`/`Upcoming`) ✅ |
@@ -180,8 +180,6 @@ erDiagram
 | `date_of_birth` | DATE | NULL | Date of Birth (**verified from `StudentEditProfile.js` state `dob`**) |
 | `phone` | VARCHAR(20) | NULL | Student Mobile Number |
 | `email` | VARCHAR(128) | NULL | Student Email |
-| `parent_name` | VARCHAR(128) | NULL | Parent / Guardian Name |
-| `parent_phone` | VARCHAR(20) | NULL | Parent Contact Number (**verified from `StudentEditProfile.js` state `parentPhone`**) |
 | `blood_group` | VARCHAR(8) | NULL | e.g., `O+ve`, `B+ve` (**verified from `StudentEditProfile.js` state `bloodGroup`**) |
 | `address` | TEXT | NULL | Residential Address (**verified from `StudentEditProfile.js` state `address`**) |
 | `avatar_url` | TEXT | NULL | Profile image URL |
