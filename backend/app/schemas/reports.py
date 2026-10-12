@@ -33,9 +33,19 @@ class FacultyWorkloadResponse(BaseModel):
     faculty: List[FacultyWorkloadItem]
 
 
+class WeeklyTrendDay(BaseModel):
+    label: str
+    percentage: float
+    sessions_count: int
+
+
 class DepartmentKpiResponse(BaseModel):
     total_students: int
     total_staff: int
     today_attendance_percentage: float
+    overall_attendance_percentage: float = 0.0
     students_below_75_count: int
     active_courses_count: int
+    total_sessions_conducted: int = 0
+    weekly_trend: List[WeeklyTrendDay] = []
+

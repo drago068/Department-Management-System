@@ -20,34 +20,6 @@ import {
   autoDistributeStudentMentors,
 } from '../../../services/api/profiles';
 
-const INITIAL_STUDENTS = [
-  {
-    id: '24AD012',
-    name: 'Abishek R K',
-    section: 'III Year • Sec A',
-    initials: 'AR',
-  },
-  {
-    id: '24AD001',
-    name: 'Gnana Prakash V',
-    section: 'III Year • Sec A',
-    initials: 'GP',
-  },
-  {
-    id: '24AD018',
-    name: 'Esakki Muthu M',
-    section: 'III Year • Sec A',
-    initials: 'EM',
-  },
-  {
-    id: '24AD009',
-    name: 'Bhavani S',
-    section: 'III Year • Sec A',
-    mentor: 'Dr. Kumar',
-    initials: 'BS',
-  },
-];
-
 const COLORS = {
   primary: '#003fb1',
   primaryLight: '#dbe1ff',
@@ -65,23 +37,17 @@ const COLORS = {
   successBg: '#dce2f3',
 };
 
-const DEFAULT_FACULTY = [
-  { id: 'f1', name: 'Dr. Sarah Jenkins', title: 'Assoc. Prof • AI & Data Science', assigned: 15, capacity: 20 },
-  { id: 'f2', name: 'Dr. Kumar', title: 'Professor • AI & Data Science', assigned: 9, capacity: 20 },
-  { id: 'f3', name: 'Prof. Saravanan M', title: 'Assistant Professor • AI & Data Science', assigned: 12, capacity: 20 },
-];
-
 export default function MentorProctorAllocationScreen({ navigation }) {
-  const [students, setStudents] = useState(INITIAL_STUDENTS);
-  const [facultyList, setFacultyList] = useState(DEFAULT_FACULTY);
+  const [students, setStudents] = useState([]);
+  const [facultyList, setFacultyList] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
-  const [statusFilter, setStatusFilter] = useState('unassigned');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [facultyIndex, setFacultyIndex] = useState(0);
   const [showFacultyPicker, setShowFacultyPicker] = useState(false);
-  const [department, setDepartment] = useState('AI & Data Science');
-  const [section, setSection] = useState('Sec A');
-  const [batch, setBatch] = useState('2024–2028 (UG) • Third Year');
+  const [department, setDepartment] = useState('All');
+  const [section, setSection] = useState('All');
+  const [batch, setBatch] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
   const [toast, setToast] = useState('');
   const [loading, setLoading] = useState(false);
@@ -92,14 +58,14 @@ export default function MentorProctorAllocationScreen({ navigation }) {
     try {
       // 1. Fetch Faculty Mentors
       const mentorRes = await getFacultyMentors();
-      const mList = mentorRes.data || mentorRes;
+      const mList = Array.isArray(mentorRes) ? mentorRes : (mentorRes?.data || []);
       if (Array.isArray(mList) && mList.length > 0) {
         setFacultyList(
           mList.map((m) => ({
             id: m.id,
-            name: m.name,
-            title: m.title,
-            assigned: m.assigned || 0,
+            name: m.name || m.full_name,
+            title: m.title || m.designation || 'Faculty Mentor',
+            assigned: m.assigned !== undefined ? m.assigned : (m.assigned_students_count || 0),
             capacity: m.capacity || 20,
           }))
         );
@@ -107,12 +73,12 @@ export default function MentorProctorAllocationScreen({ navigation }) {
 
       // 2. Fetch Students
       const allocRes = await getStudentAllocation({
-        department,
-        section,
+        department: department === 'All' ? undefined : department,
+        section: section === 'All' ? undefined : section,
         status: 'all',
       });
-      const allocData = allocRes.data || allocRes;
-      if (allocData && Array.isArray(allocData.students) && allocData.students.length > 0) {
+      const allocData = allocRes?.students ? allocRes : (allocRes?.data || allocRes);
+      if (allocData && Array.isArray(allocData.students)) {
         const mapped = allocData.students.map((st) => ({
           id: st.register_number || st.id,
           rawId: st.id,
@@ -125,7 +91,7 @@ export default function MentorProctorAllocationScreen({ navigation }) {
         setStudents(mapped);
       }
     } catch (err) {
-      console.log('Error loading allocation data, using local roster:', err.message);
+      console.error('Error loading allocation data:', err);
     } finally {
       setLoading(false);
     }
@@ -135,7 +101,14 @@ export default function MentorProctorAllocationScreen({ navigation }) {
     loadData();
   }, [department, section]);
 
-  const selectedFaculty = facultyList[facultyIndex] || DEFAULT_FACULTY[0];
+  const selectedFaculty = facultyList[facultyIndex] || {
+    id: '',
+    name: 'Faculty Mentor',
+    title: 'Faculty',
+    assigned: 0,
+    capacity: 20,
+  };
+
   const unassignedCount = students.filter((s) => !s.mentor).length;
   const assignedCount = students.length - unassignedCount;
 

@@ -19,7 +19,7 @@ const AttendanceHistory = ({ navigation }) => {
 
   useEffect(() => {
     let isMounted = true;
-    getAttendanceHistory()
+    getAttendanceHistory({ limit: 100 })
       .then((data) => {
         if (isMounted) {
           const list = Array.isArray(data) ? data : data?.sessions || [];

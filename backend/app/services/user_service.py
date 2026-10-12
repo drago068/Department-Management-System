@@ -795,19 +795,46 @@ class UserService:
             selectinload(Student.faculty_mentor),
         ).where(Student.is_active == True)
 
-        if department_name and department_name.strip():
-            dept_term = department_name.strip()
-            stmt = stmt.join(Student.department).where(Department.name.ilike(f"%{dept_term}%") | Department.code.ilike(f"%{dept_term}%"))
+        if department_name and department_name.strip() and department_name.strip().lower() not in ["all", "any", "all departments"]:
+            dept_term = department_name.strip().lower()
+            dept_cond = (Department.name.ilike(f"%{dept_term}%") | Department.code.ilike(f"%{dept_term}%"))
+            if "ai" in dept_term or "data" in dept_term or "aids" in dept_term:
+                dept_cond = dept_cond | Department.code.ilike("%AIDS%") | Department.name.ilike("%Intelligence%")
+            if "cs" in dept_term or "comp" in dept_term:
+                dept_cond = dept_cond | Department.code.ilike("%CSE%") | Department.name.ilike("%Computer%")
+            stmt = stmt.join(Student.department).where(dept_cond)
 
-        if batch_name and batch_name.strip():
-            clean_b = batch_name.strip().replace("–", "-").split()[0]
-            stmt = stmt.join(Student.batch).where(Batch.batch_name.ilike(f"%{clean_b}%"))
+        if batch_name and batch_name.strip() and batch_name.strip().lower() not in ["all", "any", "all batches"]:
+            import re
+            years = re.findall(r"\d{4}", batch_name)
+            if years:
+                from sqlalchemy import or_
+                stmt = stmt.join(Student.batch).where(or_(*[Batch.batch_name.ilike(f"%{y}%") for y in years]))
+            else:
+                clean_b = batch_name.strip().replace("–", "-").split()[0]
+                stmt = stmt.join(Student.batch).where(Batch.batch_name.ilike(f"%{clean_b}%"))
 
-        if section_name and section_name.strip():
+        if section_name and section_name.strip() and section_name.strip().lower() not in ["all", "any", "all sections"]:
             sec_clean = section_name.strip().replace("Sec", "").replace("Section", "").strip()
             stmt = stmt.join(Student.section).where(Section.name.ilike(f"%{sec_clean}%"))
 
         students_all = (await db.execute(stmt.order_by(Student.register_number))).scalars().all()
+
+        # If strict batch filter yielded 0 students, attempt relaxed query so valid students in section/dept are displayed
+        if len(students_all) == 0 and (department_name or batch_name or section_name):
+            fallback_stmt = select(Student).options(
+                selectinload(Student.department),
+                selectinload(Student.batch),
+                selectinload(Student.section),
+                selectinload(Student.faculty_mentor),
+            ).where(Student.is_active == True)
+            if section_name and section_name.strip() and section_name.strip().lower() not in ["all", "any", "all sections"]:
+                sec_clean = section_name.strip().replace("Sec", "").replace("Section", "").strip()
+                fallback_stmt = fallback_stmt.join(Student.section).where(Section.name.ilike(f"%{sec_clean}%"))
+            fallback_results = (await db.execute(fallback_stmt.order_by(Student.register_number))).scalars().all()
+            if fallback_results:
+                students_all = fallback_results
+
 
         total_count = len(students_all)
         unassigned_count = sum(1 for s in students_all if s.faculty_mentor_id is None)

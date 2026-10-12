@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, SafeAreaView, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Colors from '../../../constants/colors';
 import Typography from '../../../constants/typography';
@@ -7,31 +7,62 @@ import TopAppBar from '../../../components/common/TopAppBar';
 import BottomNavBar from '../../../components/common/BottomNavBar';
 import { useAuth } from '../../auth/context/AuthContext';
 import { getAttendanceHistory } from '../../../services/api/attendance';
+import { getDepartmentSummary } from '../../../services/api/reports';
 
 const AdminDashboard = ({ navigation }) => {
   const { user, profile, signOut } = useAuth();
-  const [activities, setActivities] = useState([
-    { course: 'CS101 - Intro to Programming', instructor: 'Dr. Alan Turing', status: 'Submitted (38/40)', statusType: 'success', time: '10:05 AM' },
-    { course: 'MA202 - Discrete Math', instructor: 'Prof. Ada Lovelace', status: 'Pending Review', statusType: 'warning', time: '09:45 AM' },
-    { course: 'PH301 - Quantum Physics', instructor: 'Dr. Richard Feynman', status: 'Submitted (25/25)', statusType: 'success', time: '09:15 AM' },
-  ]);
+  const [activities, setActivities] = useState([]);
+  const [loadingActivities, setLoadingActivities] = useState(true);
+  const [kpis, setKpis] = useState({
+    total_students: 0,
+    total_staff: 0,
+    today_attendance_percentage: 0,
+    overall_attendance_percentage: 0,
+    students_below_75_count: 0,
+    weekly_trend: [],
+  });
+  const [loadingKpis, setLoadingKpis] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
-    getAttendanceHistory({ limit: 4 })
+
+    // 1. Fetch live institutional department KPIs
+    getDepartmentSummary()
       .then((res) => {
-        if (isMounted && res?.data && Array.isArray(res.data) && res.data.length > 0) {
-          const mapped = res.data.map((item) => ({
-            course: `${item.subject_code || 'SUB'} - ${item.subject_name || 'Class Session'}`,
-            instructor: item.marked_by_name || 'Faculty Member',
-            status: item.present_count !== undefined ? `Marked (${item.present_count}/${item.total_count || item.present_count})` : 'Submitted',
-            statusType: 'success',
-            time: item.marking_date || 'Today',
-          }));
-          setActivities(mapped);
+        if (isMounted && res) {
+          const data = res.data || res;
+          setKpis(data);
+          setLoadingKpis(false);
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error('Failed to load department KPIs:', err);
+        if (isMounted) setLoadingKpis(false);
+      });
+
+    // 2. Fetch live recent attendance sessions
+    getAttendanceHistory({ limit: 5 })
+      .then((res) => {
+        if (isMounted) {
+          const list = Array.isArray(res) ? res : (res?.sessions || res?.data || []);
+          if (list.length > 0) {
+            const mapped = list.map((item) => ({
+              course: `${item.course_code || 'SUB'} - ${item.course_name || 'Session'}`,
+              instructor: item.staff_name || 'Faculty Member',
+              status: item.total_count ? `Marked (${item.present_count}/${item.total_count})` : 'Submitted',
+              statusType: (item.present_count / (item.total_count || 1)) >= 0.75 ? 'success' : 'warning',
+              time: item.date ? `${item.date.slice(5)} • ${item.period || 'Period'}` : 'Recent',
+            }));
+            setActivities(mapped);
+          }
+          setLoadingActivities(false);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load recent attendance sessions:', err);
+        if (isMounted) setLoadingActivities(false);
+      });
+
     return () => { isMounted = false; };
   }, [profile]);
 
@@ -53,10 +84,37 @@ const AdminDashboard = ({ navigation }) => {
   ];
 
   const stats = [
-    { label: 'Total Students', value: '1,200', icon: 'groups', color: Colors.primary, sub: '+2% from last semester' },
-    { label: 'Total Staff', value: '45', icon: 'badge', color: Colors.tertiary, sub: 'Active faculty' },
-    { label: "Today's Attendance", value: '94%', icon: 'analytics', color: Colors.primary, sub: '+1.5%', trending: true },
-    { label: 'Below Req (75%)', value: '12', icon: 'warning', color: Colors.error, isAlert: true, link: 'Review Students →' },
+    {
+      label: 'Total Students',
+      value: loadingKpis ? '...' : `${kpis.total_students || 0}`,
+      icon: 'groups',
+      color: Colors.primary,
+      sub: 'Active enrolled',
+    },
+    {
+      label: 'Total Staff',
+      value: loadingKpis ? '...' : `${kpis.total_staff || 0}`,
+      icon: 'badge',
+      color: Colors.tertiary,
+      sub: 'Active faculty',
+    },
+    {
+      label: "Today's Attendance",
+      value: loadingKpis ? '...' : `${kpis.today_attendance_percentage || kpis.overall_attendance_percentage || 0}%`,
+      icon: 'analytics',
+      color: Colors.primary,
+      sub: `Overall ${kpis.overall_attendance_percentage || 0}%`,
+      trending: (kpis.today_attendance_percentage || 0) >= 90,
+    },
+    {
+      label: 'Below Req (75%)',
+      value: loadingKpis ? '...' : `${kpis.students_below_75_count || 0}`,
+      icon: 'warning',
+      color: Colors.error,
+      isAlert: (kpis.students_below_75_count || 0) > 0,
+      link: 'Review Students →',
+      onLinkPress: () => navigation?.navigate('ReportManagement'),
+    },
   ];
 
   const quickActions = [
@@ -66,13 +124,18 @@ const AdminDashboard = ({ navigation }) => {
     { label: 'Generate Reports', icon: 'summarize', color: Colors.primary },
   ];
 
-  const barData = [
-    { label: 'Mon', height: 80 },
-    { label: 'Tue', height: 85 },
-    { label: 'Wed', height: 92 },
-    { label: 'Thu', height: 90 },
-    { label: 'Fri', height: 95 },
-  ];
+  const barData = (kpis.weekly_trend && kpis.weekly_trend.length > 0)
+    ? kpis.weekly_trend.map((b) => ({
+        label: b.label,
+        height: Math.min(100, Math.max(10, Math.round(b.percentage))),
+      }))
+    : [
+        { label: 'Mon', height: 94 },
+        { label: 'Tue', height: 94 },
+        { label: 'Wed', height: 94 },
+        { label: 'Thu', height: 94 },
+        { label: 'Fri', height: 93 },
+      ];
 
   const statusColor = (type) => {
     if (type === 'success') return { bg: '#dcfce7', text: '#166534' };
@@ -114,7 +177,7 @@ const AdminDashboard = ({ navigation }) => {
                     <Text style={styles.trendText}>{stat.sub}</Text>
                   </View>
                 ) : stat.link ? (
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={stat.onLinkPress} activeOpacity={0.7}>
                     <Text style={styles.linkText}>{stat.link}</Text>
                   </TouchableOpacity>
                 ) : (
@@ -128,7 +191,7 @@ const AdminDashboard = ({ navigation }) => {
           <View style={styles.chartCard}>
             <View style={styles.chartHeader}>
               <Text style={styles.sectionTitle}>Weekly Attendance Trend</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation?.navigate('AttendanceHistory')}>
                 <MaterialIcons name="more-vert" size={24} color={Colors.secondary} />
               </TouchableOpacity>
             </View>
@@ -148,7 +211,7 @@ const AdminDashboard = ({ navigation }) => {
           <View style={styles.tableCard}>
             <View style={styles.tableHeader}>
               <Text style={styles.sectionTitle}>Recent Activity</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation?.navigate('AttendanceHistory')}>
                 <Text style={styles.viewLink}>View All</Text>
               </TouchableOpacity>
             </View>
@@ -159,22 +222,37 @@ const AdminDashboard = ({ navigation }) => {
               <Text style={[styles.tableHeaderCell, { flex: 1.5 }]}>Status</Text>
               <Text style={[styles.tableHeaderCell, { flex: 0.8, textAlign: 'right' }]}>Time</Text>
             </View>
-            {activities.map((act, index) => {
-              const sc = statusColor(act.statusType);
-              return (
-                <View key={index} style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { flex: 2 }]}>{act.course}</Text>
-                  <Text style={[styles.tableCell, { flex: 1.5, color: Colors.onSurfaceVariant }]}>{act.instructor}</Text>
-                  <View style={{ flex: 1.5 }}>
-                    <View style={[styles.statusBadge, { backgroundColor: sc.bg }]}>
-                      <Text style={[styles.statusText, { color: sc.text }]}>{act.status}</Text>
+            {loadingActivities ? (
+              <View style={{ padding: 24, alignItems: 'center' }}>
+                <ActivityIndicator size="small" color={Colors.primary} />
+                <Text style={{ ...Typography.labelSm, color: Colors.secondary, marginTop: 8 }}>Loading sessions...</Text>
+              </View>
+            ) : activities.length === 0 ? (
+              <View style={{ padding: 24, alignItems: 'center' }}>
+                <MaterialIcons name="history-edu" size={32} color={Colors.outline} />
+                <Text style={{ ...Typography.bodyMd, color: Colors.onSurfaceVariant, marginTop: 8 }}>
+                  No attendance sessions marked yet.
+                </Text>
+              </View>
+            ) : (
+              activities.map((act, index) => {
+                const sc = statusColor(act.statusType);
+                return (
+                  <View key={index} style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 2 }]} numberOfLines={1}>{act.course}</Text>
+                    <Text style={[styles.tableCell, { flex: 1.5, color: Colors.onSurfaceVariant }]} numberOfLines={1}>{act.instructor}</Text>
+                    <View style={{ flex: 1.5 }}>
+                      <View style={[styles.statusBadge, { backgroundColor: sc.bg }]}>
+                        <Text style={[styles.statusText, { color: sc.text }]}>{act.status}</Text>
+                      </View>
                     </View>
+                    <Text style={[styles.tableCell, { flex: 0.8, textAlign: 'right', color: Colors.secondary, fontSize: 12 }]}>{act.time}</Text>
                   </View>
-                  <Text style={[styles.tableCell, { flex: 0.8, textAlign: 'right', color: Colors.secondary, fontSize: 12 }]}>{act.time}</Text>
-                </View>
-              );
-            })}
+                );
+              })
+            )}
           </View>
+
 
           {/* Quick Actions */}
           <View style={styles.quickActionsCard}>

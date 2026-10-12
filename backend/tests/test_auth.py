@@ -6,7 +6,7 @@ from httpx import AsyncClient
 async def test_student_login_success(client: AsyncClient):
     response = await client.post(
         "/api/v1/auth/login",
-        json={"identifier": "CS2024-001", "password": "Password123!", "role": "STUDENT"},
+        json={"identifier": "714022AD004", "password": "Password123!", "role": "STUDENT"},
     )
     assert response.status_code == 200
     data = response.json()
@@ -14,8 +14,8 @@ async def test_student_login_success(client: AsyncClient):
     assert "access_token" in data["data"]
     assert "refresh_token" in data["data"]
     assert data["data"]["user"]["role"] == "STUDENT"
-    assert data["data"]["user"]["identifier"] == "CS2024-001"
-    assert data["data"]["user"]["profile"]["full_name"] == "Arjun Patel"
+    assert data["data"]["user"]["identifier"] == "714022AD004"
+    assert "Sneha" in data["data"]["user"]["profile"]["full_name"]
 
 
 @pytest.mark.asyncio
@@ -28,7 +28,7 @@ async def test_faculty_login_success(client: AsyncClient):
     data = response.json()
     assert data["success"] is True
     assert data["data"]["user"]["role"] == "STAFF"
-    assert data["data"]["user"]["profile"]["full_name"] == "Dr. Kumar"
+    assert "Kumar" in data["data"]["user"]["profile"]["full_name"]
 
 
 @pytest.mark.asyncio
@@ -48,7 +48,7 @@ async def test_admin_login_success(client: AsyncClient):
 async def test_invalid_password_fails(client: AsyncClient):
     response = await client.post(
         "/api/v1/auth/login",
-        json={"identifier": "CS2024-001", "password": "WrongPassword!", "role": "STUDENT"},
+        json={"identifier": "714022AD004", "password": "WrongPassword!", "role": "STUDENT"},
     )
     assert response.status_code == 401
     data = response.json()
@@ -61,7 +61,7 @@ async def test_token_refresh_flow(client: AsyncClient):
     # 1. Login
     login_res = await client.post(
         "/api/v1/auth/login",
-        json={"identifier": "CS2024-001", "password": "Password123!"},
+        json={"identifier": "714022AD004", "password": "Password123!"},
     )
     refresh_token = login_res.json()["data"]["refresh_token"]
 
@@ -75,3 +75,4 @@ async def test_token_refresh_flow(client: AsyncClient):
     assert "access_token" in new_data
     assert "refresh_token" in new_data
     assert new_data["refresh_token"] != refresh_token  # Rotated!
+

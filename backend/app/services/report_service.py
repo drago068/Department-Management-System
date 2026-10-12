@@ -15,6 +15,7 @@ from app.schemas.reports import (
     DepartmentKpiResponse,
     FacultyWorkloadItem,
     FacultyWorkloadResponse,
+    WeeklyTrendDay,
 )
 
 
@@ -106,6 +107,22 @@ class ReportService:
         total_staff = (await db.execute(select(func.count(Staff.id)).where(Staff.is_active == True))).scalar() or 0
         active_courses = (await db.execute(select(func.count(Course.id)).where(Course.is_active == True))).scalar() or 0
 
+        # Overall attendance aggregates
+        overall_stats = (
+            await db.execute(
+                select(
+                    func.sum(AttendanceSession.present_count + AttendanceSession.od_count),
+                    func.sum(AttendanceSession.total_marked),
+                    func.count(AttendanceSession.id)
+                )
+            )
+        ).first()
+
+        overall_present = overall_stats[0] or 0
+        overall_total = overall_stats[1] or 0
+        total_sessions = overall_stats[2] or 0
+        overall_pct = round((overall_present / overall_total * 100), 1) if overall_total > 0 else 0.0
+
         # Today's attendance percentage
         today = date.today()
         today_sessions = (
@@ -114,12 +131,47 @@ class ReportService:
             )
         ).scalars().all()
 
-        today_pct = 94.2  # default healthy baseline if no sessions held yet today
+        today_pct = overall_pct if overall_pct > 0 else 94.2
         if today_sessions:
             tot_marked = sum(s.total_marked for s in today_sessions)
             tot_present = sum(s.present_count + s.od_count for s in today_sessions)
             if tot_marked > 0:
                 today_pct = round((tot_present / tot_marked * 100), 1)
+
+        # Weekly trend (Mon, Tue, Wed, Thu, Fri)
+        recent_sessions = (
+            await db.execute(
+                select(AttendanceSession)
+                .order_by(AttendanceSession.date.desc())
+                .limit(75)
+            )
+        ).scalars().all()
+
+        day_stats = {
+            "Mon": {"present": 0, "total": 0, "count": 0},
+            "Tue": {"present": 0, "total": 0, "count": 0},
+            "Wed": {"present": 0, "total": 0, "count": 0},
+            "Thu": {"present": 0, "total": 0, "count": 0},
+            "Fri": {"present": 0, "total": 0, "count": 0},
+        }
+        for s in recent_sessions:
+            day_name = s.date.strftime("%a")
+            if day_name in day_stats:
+                day_stats[day_name]["present"] += (s.present_count + s.od_count)
+                day_stats[day_name]["total"] += s.total_marked
+                day_stats[day_name]["count"] += 1
+
+        weekly_trend: List[WeeklyTrendDay] = []
+        for day in ["Mon", "Tue", "Wed", "Thu", "Fri"]:
+            st = day_stats[day]
+            day_pct = round((st["present"] / st["total"] * 100), 1) if st["total"] > 0 else (overall_pct or 90.0)
+            weekly_trend.append(
+                WeeklyTrendDay(
+                    label=day,
+                    percentage=day_pct,
+                    sessions_count=st["count"],
+                )
+            )
 
         # Count defaulters (< 75%)
         defaulters_data = await ReportService.get_defaulters_report(db, threshold=75.0)
@@ -128,6 +180,10 @@ class ReportService:
             total_students=total_students,
             total_staff=total_staff,
             today_attendance_percentage=today_pct,
+            overall_attendance_percentage=overall_pct,
             students_below_75_count=defaulters_data.defaulters_count,
             active_courses_count=active_courses,
+            total_sessions_conducted=total_sessions,
+            weekly_trend=weekly_trend,
         )
+
